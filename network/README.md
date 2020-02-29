@@ -1,4 +1,5 @@
-In this folder, we shall collect some example code that is working for the network issues.
+In this folder, there are sample code to illustrate the three most important ideas about computer network:
 
-# Content
-1. [http methods]()
+* HTTP
+* TCP
+* UDP
