@@ -8,4 +8,4 @@
     The most significant part is to use the function Boolean.valueOf to convert the string to be Boolean.
 */
 
-A == null ? false : Boolean.valueOf(A.getFuncOrDefault(/*getKeyFunc*/, /*DefaultValueFunction*/)).getValue());
+A == null ? false : Boolean.valueOf(A.getFuncOrDefault(/*key*/, /*defaultValue*/)).getValue());
