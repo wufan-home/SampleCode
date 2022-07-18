@@ -12,3 +12,14 @@ def run_command(cmd):
         return None
     output = raw_output.stdout.readlines()
     return output
+
+
+## This function accepts the command in the array format,
+## like ['ssh', '-i', key, primary_ms_hostname, 'curl',
+##       '-H', '\"Content-Type:', 'application/json\"', '-X', 'POST', '-d', json_block,
+##       'http://localhost:19000/<api>']
+def execute_command_array(cmd_arr):
+    output = Popen(cmd_arr, stdout=PIPE).communicate()[0]
+    if output is None:
+        return None
+    return output
