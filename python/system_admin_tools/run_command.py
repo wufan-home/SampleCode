@@ -3,6 +3,7 @@
 ## Tnput: a string '' or "".
 ## Output: A list of lines from the output.
 
+import log
 import subprocess
 
 
@@ -12,21 +13,21 @@ import subprocess
 # use_shell: use the shell to parse the cmd_array. This is for the locally running command. 
 # Default: True.
 # timeout_s: timeout in second. Default is 5 seconds.
-def run(cmd_array, use_shell=True, timeout_s=5, log_file):
+def run(cmd_array, use_shell=True, timeout_s=5):
     # To avoid infinity loops, any command can only be executed for 120 seconds.
     try:
         response = subprocess.run(cmd_array, shell=use_shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                   encoding="utf-8", timeout=timeout_s)
     except subprocess.TimeoutExpired:
-        log.write("ERROR", "Timeout (" + str(timeout_s) + " seconds): " + ' '.join(cmd_array))
+        log.write('ERROR', "Timeout (" + str(timeout_s) + " seconds): " + ' '.join(cmd_array))
         return None
     except subprocess.CalledProcessError:
-        log.write('ERROR', 'Server Error: ' + ' '.join(cmd_array))
+        log.write('ERROR', "Server Error: " + ' '.join(cmd_array))
         return None
     if response is None:
-        log.write("ERROR", "None output: " + ' '.join(cmd_array))
+        log.write('ERROR', "None output: " + ' '.join(cmd_array))
     else:
-        log.write("INFO", "Success: " + ' '.join(cmd_array))
+        log.write('INFO', "Success: " + ' '.join(cmd_array))
     return response
 
 
