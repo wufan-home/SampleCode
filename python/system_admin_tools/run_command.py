@@ -8,6 +8,7 @@ import subprocess
 
 # This is the preferred approach.
 # The call of this function is blocking.
+# cmd can be a string or an array.
 def execute_linux_command(cmd, log_file):
     # To avoid infinity loops, any command can only be executed for 120 seconds.
     try:
