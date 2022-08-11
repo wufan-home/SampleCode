@@ -10,11 +10,11 @@ import subprocess
 # The call of this function is blocking.
 # cmd can be a string or an array.
 # Why need `shell=True`???
-def run(cmd_array, log_file):
+def run(cmd_array, use_shell, timeout_s, log_file):
     # To avoid infinity loops, any command can only be executed for 120 seconds.
     try:
-        response = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                  encoding="utf-8", timeout=120)
+        response = subprocess.run(cmd_array, shell=use_shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                  encoding="utf-8", timeout=timeout_s)
     except subprocess.TimeoutExpired:
         log.write("ERROR", "Timeout: " + ' '.join(cmd_array))
         return None
