@@ -9,18 +9,19 @@ import subprocess
 # This is the preferred approach.
 # The call of this function is blocking.
 # cmd can be a string or an array.
-def execute_linux_command(cmd, log_file):
+# Why need `shell=True`???
+def run(cmd_array, log_file):
     # To avoid infinity loops, any command can only be executed for 120 seconds.
     try:
         response = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                   encoding="utf-8", timeout=120)
     except subprocess.TimeoutExpired:
-        log(log_file, "ERROR", "Timeout of the command: " + cmd)
+        log.write("ERROR", "Timeout: " + ' '.join(cmd_array))
         return None
     if response is None:
-        log(log_file, "ERROR", "Failed to get the output the command: " + cmd)
-        return None
-    log(log_file, "INFO", "Successfully run the command: " + cmd)
+        log.write("ERROR", "None output: " + ' '.join(cmd_array))
+    else:
+        log.write("INFO", "Success: " + ' '.join(cmd_array))
     return response
 
 
