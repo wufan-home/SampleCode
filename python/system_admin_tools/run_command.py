@@ -6,6 +6,23 @@
 import subprocess
 
 
+# This is the preferred approach.
+# The call of this function is blocking.
+def execute_linux_command(cmd, log_file):
+    # To avoid infinity loops, any command can only be executed for 120 seconds.
+    try:
+        response = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                  encoding="utf-8", timeout=120)
+    except subprocess.TimeoutExpired:
+        log(log_file, "ERROR", "Timeout of the command: " + cmd)
+        return None
+    if response is None:
+        log(log_file, "ERROR", "Failed to get the output the command: " + cmd)
+        return None
+    log(log_file, "INFO", "Successfully run the command: " + cmd)
+    return response
+
+
 def run_command(cmd):
     raw_output = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     if raw_output is None:
