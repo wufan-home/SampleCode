@@ -1,5 +1,6 @@
 # The script will split one line by blank and fill the words by 
 # word1,word2 into the target file.
+
 #!/usr/bin/env python3
 
 
@@ -26,12 +27,12 @@ if __name__ == '__main__':
         os.remove(args.output)
 
     with open(args.filename) as reader:
-        region_rack_list = reader.readlines()
+        lines = reader.readlines()
 
     with open(args.output, 'w') as writer:
-        for region_rack in region_rack_list:
-            msg_list = region_rack.split()
-            for i in range(0, len(msg_list), 2):
-                writer.write('{},{}\n'.format(msg_list[i], msg_list[i + 1]))
+        for line in lines:
+            words = line.split()
+            for i in range(0, len(words), 2):
+                writer.write('{},{}\n'.format(words[i], words[i + 1]))
 
     print("End format source data file ", datetime.datetime.strftime(datetime.datetime.now(), "%Y-%m-%dT%H:%M:%S"))
