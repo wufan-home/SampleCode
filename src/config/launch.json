@@ -1,0 +1,56 @@
+# Vscode remote connection
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "leadertest",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/../bazel-bin/blockstorage/replication/block/test/leadertest",
+      "additionalSOLibSearchPath": "${workspaceFolder}/../bazel-bin;${workspaceFolder}/bazel-out",
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/../",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "/bin/gdb",
+      "miDebuggerArgs": "--directory=${workspaceFolder}/../bazel-out ",
+      "setupCommands": [
+        {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+        },
+        {
+            "description": "Set Disassembly Flavor to Intel",
+            "text": "-gdb-set disassembly-flavor intel",
+            "ignoreFailures": true
+        }
+      ]
+    },
+    {
+      "name": "extentserver",
+      "type": "cppdbg",
+      "request": "attach",
+      "program": "${workspaceFolder}/../bazel-bin/blockstorage/extentServer",
+      "additionalSOLibSearchPath": "${workspaceFolder}/../bazel-bin;${workspaceFolder}/bazel-out",
+      "processId":"74059",
+      "MIMode": "gdb",
+      // "miDebuggerServerAddress": "100.94.53.45:10086",
+      "miDebuggerPath": "/bin/gdb",
+      "miDebuggerArgs": "--directory=${workspaceFolder}/../bazel-out ",
+      "setupCommands": [
+        {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+        },
+        {
+            "description": "Set Disassembly Flavor to Intel",
+            "text": "-gdb-set disassembly-flavor intel",
+            "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}
