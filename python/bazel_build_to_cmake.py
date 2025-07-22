@@ -10,9 +10,9 @@ g_cur_cmake_workspace = "${CMAKE_CURRENT_SOURCE_DIR}"
 g_dst_filename = 'CMakeLists.txt'
 g_target_list = ['nvmf_tgt', 'extentServer', 'ipsec_udp', 'tgtd']
 g_targets_to_binary = {'nvmf_tgt' : '//bsv2_nvmf_tgt:nvmf_tgt',
-                     'extentServer' : '//blockstorage:extentServer',
-                     'ipsec_udp' : '//tgt:ipsec_udp',
-                     'tgtd': '//tgt:tgtd'}
+                       'extentServer' : '//blockstorage:extentServer',
+                       'ipsec_udp' : '//tgt:ipsec_udp',
+                       'tgtd': '//tgt:tgtd'}
 g_bazel_query_outputs = {}
 g_cached_lib_queue = queue.Queue()
 g_dir_set = set()
@@ -43,7 +43,8 @@ def get_dependency(binary):
         #         print("Exceptional filename {}".format(filename))
         g_bazel_query_outputs[binary].append(
             [relative_path + "/" + src.split(":")[1]
-             for src in output_src.stdout.strip().strip("[]").split("\n") if len(src.split(":")) > 1])
+             for src in output_src.stdout.strip().strip("[]").split("\n")
+                if len(src.split(":")) > 1 and 'generated' not in src])
     except subprocess.CalledProcessError as e:
         print("Bazel query for source files failed: error output:\n{}".format(e.stderr))
         exit(1)
@@ -63,12 +64,12 @@ def get_dependency(binary):
 
     g_bazel_query_outputs[binary].append(relative_path)
 
-def generate_graph(binary):
+def generate_graph(target):
     global g_bazel_query_outputs
-    if binary in g_bazel_query_outputs.keys():
+    if target in g_bazel_query_outputs.keys():
         return
-    g_bazel_query_outputs[binary] = []
-    get_dependency(binary)
+    g_bazel_query_outputs[target] = []
+    get_dependency(target)
     while g_cached_lib_queue.qsize() > 0:
         cur = g_cached_lib_queue.get()
         print("Generate the graph for the binary {}".format(cur))
@@ -84,6 +85,9 @@ def generate_cmake_files(binary, path):
         f.write("\n# Libraries\n")
         for key, value in g_bazel_query_outputs.items():
             if key is not binary:
+                if len(value[0]) == 0:
+                    # Need to add the files from the generated sources (external)
+                    continue
                 lib_name = key.lstrip("/").replace("/", "_").replace(":", "_")
                 # Define a library with specifying files
                 f.write("add_library(\"{}\"\n".format(lib_name))
@@ -145,10 +149,8 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", dest="dst", required=True,
-                        help="The path to store the CMakeLists.txt.")
-    parser.add_argument("-t", dest="target", required=True, choices=g_target_list,
-                        help="The bazel build target to generate CMakeLists.txt.")
+    parser.add_argument("-d", dest="dst", required=False, default=None, help="The path to store the CMakeLists.txt.")
+    parser.add_argument("-t", dest="target", required=True, choices=g_target_list, help="The bazel build target to generate CMakeLists.txt.")
     ARGS = parser.parse_args()
 
     if ARGS.dst is None or ARGS.dst == "":
