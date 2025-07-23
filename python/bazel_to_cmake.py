@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import argparse
 import os
 import queue
 import subprocess
@@ -8,16 +7,15 @@ import subprocess
 g_current_workspace = os.getcwd()
 g_generated_folder_prefix = "user_cache"
 g_generated_folder_path = ""
-g_cur_cmake_workspace = "${CMAKE_CURRENT_SOURCE_DIR}"
 g_dst_filename = 'CMakeLists.txt'
 g_target_list = ['extentServer', 'tgtd', 'nvmf_tgt', 'spdk_nvmf_tgt']
 g_targets_to_binary = {'extentServer' : '//blockstorage:extentServer',
                        'nvmf_tgt' : '//bsv2_nvmf_tgt:nvmf_tgt',
                        'spdk_nvmf_tgt' : '//spdk_nvmf_tgt:spdk_nvmf_tgt',
                        'tgtd': '//tgt:tgtd'}
+
 g_bazel_query_outputs = {}
 g_cached_lib_queue = queue.Queue()
-g_parsed_dir_set = set()
 
 def get_generated_folder_path():
     global g_generated_folder_path
@@ -97,27 +95,25 @@ def generate_graph(target):
         print("Generate the graph for the target {}".format(next_target))
         generate_graph(next_target)
 
-def generate_cmakelist_file(binary, path):
+def generate_cmakelist_file(path = g_current_workspace):
     with open(os.path.join(path, 'CMakeLists.txt'), 'w') as f:
         f.write("cmake_minimum_required(VERSION 3.26)\n")
-        f.write("project({})\n".format(binary))
+        f.write("project({})\n".format("workspace_usp"))
         f.write("set(CMAKE_CXX_STANDARD 17)\n")
         f.write("set(CMAKE_C_STANDARD 99)\n\n")
+        f.write("set(CMAKE_EXPORT_COMPILE_COMMANDS ON)")
 
         f.write("\n# Libraries\n")
         for key, value in g_bazel_query_outputs.items():
-            if key is not binary:
-                if len(value[0]) == 0:
-                    # Need to add the files from the generated sources (external)
-                    continue
+            if key not in g_target_list:
                 lib_name = key.lstrip("/").replace("/", "_").replace(":", "__")
                 # Define a library with the files if refers
-                f.write("add_library(\"{}\"\n".format(lib_name))
+                f.write("add_library(\"{}\" {}\n".format(lib_name, "INTERFACE" if len(value[0]) == 0 else ""))
                 for filename in value[0]:
                     f.write("    \"{}\"\n".format(filename))
                 f.write(")\n")
                 # Link the current lib with its dependencies.
-                f.write("target_link_libraries(\"{}\" \n".format(lib_name))
+                f.write("target_link_libraries(\"{}\" {}\n".format(lib_name, "INTERFACE" if len(value[0]) == 0 else "PUBLIC"))
                 for dep_lib in value[1]:
                     dep_lib_name = dep_lib.lstrip("/").replace("/", "_").replace(":", "__")
                     if dep_lib_name == lib_name:
@@ -134,40 +130,33 @@ def generate_cmakelist_file(binary, path):
                 f.write("\n")
 
         f.write("\n# Executable\n")
-        exec_name = binary.lstrip("/").replace("/", "_").replace(":", "__")
-        # Define an executable with specifying files
-        f.write("add_executable(\"{}\" \n".format(exec_name))
-        for filename in g_bazel_query_outputs[binary][0]:
-            f.write("    \"{}\"\n".format(filename))
-        f.write(")\n")
-        # Link the current executable with its dependencies.
-        f.write("target_link_libraries(\"{}\"\n".format(exec_name))
-        for filename in g_bazel_query_outputs[binary][1]:
-            f.write("    \"{}\"\n".format(filename.lstrip("/").replace("/", "_").replace(":", "__")))
-        f.write(")\n")
-        # Specify the path
-        f.write("target_include_directories(\"{}\" PUBLIC\n".format(exec_name))
-        for path in g_bazel_query_outputs[binary][2]:
-            f.write("    \"{}\"\n".format(path))
-        f.write(")\n")
-        # Specify the language the current executable being used.
-        f.write("set_target_properties(\"{}\" PROPERTIES LINKER_LANGUAGE CXX)\n".format(exec_name))
+        for target in g_target_list:
+            exec_name = target.lstrip("/").replace("/", "_").replace(":", "__")
+            # Define an executable with specifying files
+            f.write("add_executable(\"{}\" \n".format(exec_name))
+            for filename in g_bazel_query_outputs[g_targets_to_binary[target]][0]:
+                f.write("    \"{}\"\n".format(filename))
+            f.write(")\n")
+            # Link the current executable with its dependencies.
+            f.write("target_link_libraries(\"{}\" PUBLIC\n".format(exec_name))
+            for filename in g_bazel_query_outputs[g_targets_to_binary[target]][1]:
+                f.write("    \"{}\"\n".format(filename.lstrip("/").replace("/", "_").replace(":", "__")))
+            f.write(")\n")
+            # Specify the path
+            f.write("target_include_directories(\"{}\" PUBLIC\n".format(exec_name))
+            for path in g_bazel_query_outputs[g_targets_to_binary[target]][2]:
+                f.write("    \"{}\"\n".format(path))
+            f.write(")\n")
+            # Specify the language the current executable being used.
+            f.write("set_target_properties(\"{}\" PROPERTIES LINKER_LANGUAGE CXX)\n".format(exec_name))
 
-def main(args):
+def main():
     get_generated_folder_path()
-    generate_graph(g_targets_to_binary[args.target])
-    generate_cmakelist_file(g_targets_to_binary[args.target], args.dst)
+    for binary in g_target_list:
+        print("Generate the graph for the binary {}".format(binary))
+        generate_graph(g_targets_to_binary[binary])
+        print("===================================\n")
+    generate_cmakelist_file()
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-d", dest="dst", required=False, default=None,
-                        help="The path to store the CMakeLists.txt.")
-    parser.add_argument("-t", dest="target", required=True, choices=g_target_list,
-                        help="The bazel build target to generate CMakeLists.txt.")
-    ARGS = parser.parse_args()
-
-    if ARGS.dst is None or ARGS.dst == "":
-        print("Please specify the bazel build target to generate CMakeLists.txt.")
-        ARGS.dst = g_current_workspace
-
-    main(ARGS)
+    main()
