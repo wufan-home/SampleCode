@@ -129,6 +129,10 @@ def generate_cmakelist_file(path = g_current_workspace):
         f.write("    \"third-party/google-gflags/generated/x86_64-linux-gnu/private_include\"\n")
         f.write("    \"third-party/google-gtest/include\"\n")
         f.write("    \"third-party/google-protobuf/src\"\n")
+        f.write("    \"third-party/modular-boost/libs/icl/include\"\n")
+        f.write("    \"third-party/modular-boost/libs/filesystem/include\"\n")
+        f.write("    \"third-party/modular-boost/libs/uuid/include\"\n")
+        f.write("    \"third-party/modular-boost/libs/unordered/include\"\n")
         f.write(")\n\n")
 
         f.write("# Libraries\n")
