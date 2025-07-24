@@ -4,10 +4,12 @@ import os
 import queue
 import subprocess
 
+g_workspace = "${CMAKE_CURRENT_SOURCE_DIR}"
 g_current_workspace = os.getcwd()
 g_generated_folder_prefix = "user_cache"
 g_generated_folder_path = ""
 g_dst_filename = 'CMakeLists.txt'
+
 g_target_list = ['extentServer', 'tgtd', 'nvmf_tgt', 'spdk_nvmf_tgt']
 g_targets_to_binary = {'extentServer' : '//blockstorage:extentServer',
                        'nvmf_tgt' : '//bsv2_nvmf_tgt:nvmf_tgt',
@@ -16,6 +18,7 @@ g_targets_to_binary = {'extentServer' : '//blockstorage:extentServer',
 
 g_bazel_query_outputs = {}
 g_cached_lib_queue = queue.Queue()
+g_included_directories = set()
 
 def get_generated_folder_path():
     global g_generated_folder_path
@@ -27,6 +30,7 @@ def get_generated_folder_path():
         g_generated_folder_path = g_generated_folder_prefix + "/" + (output_execroot.stdout.strip(" ").rstrip("\n")
                                    .removeprefix(os.getenv("HOME") + "/.cache").lstrip("/")
                                    + "/bazel-out/k8-py2-fastbuild/bin")
+        g_included_directories.add(g_generated_folder_path)
         print ("The generated folder is {}".format(g_generated_folder_path))
     except subprocess.CalledProcessError as e:
         print("Bazel query for working path failed: error output:\n{}".format(e.stderr))
@@ -58,7 +62,7 @@ def collect_src_files(target, src_file_paths):
             if len(filename) == 0 or '+' in filename:
                 continue
             path = get_file_absolute_path(filename)
-            src_file_paths.add(path.rsplit("/", 1)[0])
+            # src_file_paths.add(path.rsplit("/", 1)[0])
             g_bazel_query_outputs[target][0].append("{}".format(path))
     except subprocess.CalledProcessError as e:
         print("Bazel query for source files failed: error {}, target {}".format(e.stderr, target))
@@ -82,7 +86,7 @@ def parse_dependency(target):
     src_file_paths = set()
     collect_src_files(target, src_file_paths)
     collect_dependencies(target)
-    g_bazel_query_outputs[target].append(src_file_paths)
+    # g_bazel_query_outputs[target].append(src_file_paths)
 
 def generate_graph(target):
     global g_bazel_query_outputs
@@ -100,8 +104,22 @@ def generate_cmakelist_file(path = g_current_workspace):
         f.write("cmake_minimum_required(VERSION 3.26)\n")
         f.write("project({})\n".format("workspace_usp"))
         f.write("set(CMAKE_CXX_STANDARD 17)\n")
-        f.write("set(CMAKE_C_STANDARD 99)\n\n")
-        f.write("set(CMAKE_EXPORT_COMPILE_COMMANDS ON)")
+        f.write("set(CMAKE_C_STANDARD 99)\n")
+        f.write("set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n")
+
+        f.write("\n # Globally included directories\n")
+        f.write("include_directories(\n")
+        f.write("    \"{}\"\n".format(g_generated_folder_path))
+        f.write("    \"{}\"\n".format(g_workspace))
+        f.write("    \"{}/folly\"\n".format(g_workspace))
+        f.write("    \"{}/spdk/include\"\n".format(g_workspace))
+        f.write("    \"{}/spdk_nvmf_tgt/include\"\n".format(g_workspace))
+        f.write("    \"third-party/google-glog/generated/x86_64-linux-gnu/private_include\"\n")
+        f.write("    \"third-party/google-gflags/generated/mipsisa64-octeon-elf/include\"\n")
+        f.write("    \"third-party/google-gflags/generated/mipsisa64-octeon-elf/private_include\"\n")
+        f.write("    \"third-party/google-gflags/generated/x86_64-linux-gnu/include\"\n")
+        f.write("    \"third-party/google-gflags/generated/x86_64-linux-gnu/private_include\"\n")
+        f.write(")\n")
 
         f.write("\n# Libraries\n")
         for key, value in g_bazel_query_outputs.items():
@@ -120,11 +138,11 @@ def generate_cmakelist_file(path = g_current_workspace):
                         continue
                     f.write("    \"{}\"\n".format(dep_lib_name))
                 f.write(")\n")
-                # Specify the path
-                f.write("target_include_directories(\"{}\" PUBLIC\n".format(lib_name))
-                for path in value[2]:
-                    f.write("    \"{}\"\n".format(path))
-                f.write(")\n")
+                # # Specify the path
+                # f.write("target_include_directories(\"{}\" PUBLIC\n".format(lib_name))
+                # for path in value[2]:
+                #     f.write("    \"{}\"\n".format(path))
+                # f.write(")\n")
                 # Specify the language the current lib being used.
                 f.write("set_target_properties(\"{}\" PROPERTIES LINKER_LANGUAGE CXX)\n".format(lib_name))
                 f.write("\n")
@@ -142,11 +160,11 @@ def generate_cmakelist_file(path = g_current_workspace):
             for filename in g_bazel_query_outputs[g_targets_to_binary[target]][1]:
                 f.write("    \"{}\"\n".format(filename.lstrip("/").replace("/", "_").replace(":", "__")))
             f.write(")\n")
-            # Specify the path
-            f.write("target_include_directories(\"{}\" PUBLIC\n".format(exec_name))
-            for path in g_bazel_query_outputs[g_targets_to_binary[target]][2]:
-                f.write("    \"{}\"\n".format(path))
-            f.write(")\n")
+            # # Specify the path
+            # f.write("target_include_directories(\"{}\" PUBLIC\n".format(exec_name))
+            # for path in g_bazel_query_outputs[g_targets_to_binary[target]][2]:
+            #     f.write("    \"{}\"\n".format(path))
+            # f.write(")\n")
             # Specify the language the current executable being used.
             f.write("set_target_properties(\"{}\" PROPERTIES LINKER_LANGUAGE CXX)\n".format(exec_name))
 
@@ -155,7 +173,7 @@ def main():
     for binary in g_target_list:
         print("Generate the graph for the binary {}".format(binary))
         generate_graph(g_targets_to_binary[binary])
-        print("===================================\n")
+        print("===================================")
     generate_cmakelist_file()
 
 if __name__ == "__main__":
