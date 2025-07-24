@@ -105,23 +105,33 @@ def generate_cmakelist_file(path = g_current_workspace):
         f.write("project({})\n".format("workspace_usp"))
         f.write("set(CMAKE_CXX_STANDARD 17)\n")
         f.write("set(CMAKE_C_STANDARD 99)\n")
-        f.write("set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n")
+        f.write("set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n\n")
 
-        f.write("\n # Globally included directories\n")
+        # Due to the header files are included in the format #include "blockstorage/base/somefile.h"
+        # i.e., the headers are using the relative path mode - relative to the root folder.
+        # We only have to include the parent folder of the headers.
+        # The including of headers' absolute folders would cause missing of headers.
+        # This is the best practice to include header files in C++ programs.
+        f.write("# Globally included directories\n")
         f.write("include_directories(\n")
         f.write("    \"{}\"\n".format(g_generated_folder_path))
         f.write("    \"{}\"\n".format(g_workspace))
         f.write("    \"{}/folly\"\n".format(g_workspace))
         f.write("    \"{}/spdk/include\"\n".format(g_workspace))
         f.write("    \"{}/spdk_nvmf_tgt/include\"\n".format(g_workspace))
+        f.write("    \"third-party/capnproto/c++/src\"\n")
+        f.write("    \"third-party/google-glog/generated/x86_64-linux-gnu/private_include\"\n")
+        f.write("    \"third-party/google-glog/src/windows\"\n")
         f.write("    \"third-party/google-glog/generated/x86_64-linux-gnu/private_include\"\n")
         f.write("    \"third-party/google-gflags/generated/mipsisa64-octeon-elf/include\"\n")
         f.write("    \"third-party/google-gflags/generated/mipsisa64-octeon-elf/private_include\"\n")
         f.write("    \"third-party/google-gflags/generated/x86_64-linux-gnu/include\"\n")
         f.write("    \"third-party/google-gflags/generated/x86_64-linux-gnu/private_include\"\n")
-        f.write(")\n")
+        f.write("    \"third-party/google-gtest/include\"\n")
+        f.write("    \"third-party/google-protobuf/src\"\n")
+        f.write(")\n\n")
 
-        f.write("\n# Libraries\n")
+        f.write("# Libraries\n")
         for key, value in g_bazel_query_outputs.items():
             if key not in g_target_list:
                 lib_name = key.lstrip("/").replace("/", "_").replace(":", "__")
