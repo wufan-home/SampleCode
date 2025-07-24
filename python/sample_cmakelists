@@ -11,12 +11,26 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/folly
     ${CMAKE_CURRENT_SOURCE_DIR}/spdk/include
     ${CMAKE_CURRENT_SOURCE_DIR}/spdk_nvmf_tgt/include
+    third-party/capnproto/c++/src
     third-party/google-glog/generated/x86_64-linux-gnu/private_include
+    third-party/google-glog/src/windows
     third-party/google-gflags/generated/mipsisa64-octeon-elf/include
     third-party/google-gflags/generated/mipsisa64-octeon-elf/private_include
     third-party/google-gflags/generated/x86_64-linux-gnu/include
     third-party/google-gflags/generated/x86_64-linux-gnu/private_include
+    third-party/google-gtest/include
+    third-party/google-protobuf/src
+    third-party/modular-boost/libs/unordered/include
 )
+
+file(GLOB_RECURSE ALL_BOOST_SUBDIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "third-party/modular-boost")
+set(INCLUDE_DIRS "")
+foreach(dir ${ALL_BOOST_SUBDIRS})
+    if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${dir}")
+        list(APPEND INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/${dir}")
+    endif()
+endforeach()
+include_directories(${INCLUDE_DIRS})
 
 # Libraries
 add_library("blockstorage__extentServer" 
