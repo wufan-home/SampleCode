@@ -2,17 +2,28 @@ cmake_minimum_required(VERSION 3.26)
 project(workspace_usp)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 99)
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+ # Globally included directories
+include_directories(
+    user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/folly
+    ${CMAKE_CURRENT_SOURCE_DIR}/spdk/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/spdk_nvmf_tgt/include
+    third-party/google-glog/generated/x86_64-linux-gnu/private_include
+    third-party/google-gflags/generated/mipsisa64-octeon-elf/include
+    third-party/google-gflags/generated/mipsisa64-octeon-elf/private_include
+    third-party/google-gflags/generated/x86_64-linux-gnu/include
+    third-party/google-gflags/generated/x86_64-linux-gnu/private_include
+)
+
 # Libraries
 add_library("blockstorage__extentServer" 
     "blockstorage/main.cpp"
 )
-target_link_libraries("blockstorage__extentServer" 
+target_link_libraries("blockstorage__extentServer" PUBLIC
     "blockstorage_extentserver__extentserver"
-)
-target_include_directories("blockstorage__extentServer" PUBLIC
-    "blockstorage"
 )
 set_target_properties("blockstorage__extentServer" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -40,7 +51,7 @@ add_library("blockstorage_extentserver__extentserver"
     "blockstorage/extentserver/UspMediaReplicaConfigStore.cpp"
     "blockstorage/extentserver/UspMediaReplicaConfigStore.h"
 )
-target_link_libraries("blockstorage_extentserver__extentserver" 
+target_link_libraries("blockstorage_extentserver__extentserver" PUBLIC
     "blockstorage_async__blockdevice"
     "blockstorage_base__background_logger"
     "blockstorage_base__event_base_diagnostics"
@@ -65,9 +76,6 @@ target_link_libraries("blockstorage_extentserver__extentserver"
     "third-party_google-glog__google-glog"
     "third-party_libfiu__libfiu"
 )
-target_include_directories("blockstorage_extentserver__extentserver" PUBLIC
-    "blockstorage/extentserver"
-)
 set_target_properties("blockstorage_extentserver__extentserver" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_async__blockdevice" 
@@ -77,7 +85,7 @@ add_library("blockstorage_async__blockdevice"
     "blockstorage/async/BlockDeviceNvme.cpp"
     "blockstorage/async/BlockDeviceSpdk.h"
 )
-target_link_libraries("blockstorage_async__blockdevice" 
+target_link_libraries("blockstorage_async__blockdevice" PUBLIC
     "blockstorage_async__async"
     "blockstorage_async__blockstoragespdk"
     "blockstorage_async__spdkhooks"
@@ -87,23 +95,17 @@ target_link_libraries("blockstorage_async__blockdevice"
     "bsv2_java_proto__management-proto"
     "third-party_google-glog__google-glog"
 )
-target_include_directories("blockstorage_async__blockdevice" PUBLIC
-    "blockstorage/async"
-)
 set_target_properties("blockstorage_async__blockdevice" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_base__background_logger" 
     "blockstorage/base/BackgroundLogger.cpp"
     "blockstorage/base/BackgroundLogger.h"
 )
-target_link_libraries("blockstorage_base__background_logger" 
+target_link_libraries("blockstorage_base__background_logger" PUBLIC
     "blockstorage_base__threadpool"
     "blockstorage_metrics__metrics"
     "third-party_google-gflags__google-gflags"
     "third-party_google-glog__google-glog"
-)
-target_include_directories("blockstorage_base__background_logger" PUBLIC
-    "blockstorage/base"
 )
 set_target_properties("blockstorage_base__background_logger" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -112,12 +114,9 @@ add_library("blockstorage_base__event_base_diagnostics"
     "blockstorage/base/EventBaseDiagnostics.h"
     "blockstorage/base/FiberDiagnostics.h"
 )
-target_link_libraries("blockstorage_base__event_base_diagnostics" 
+target_link_libraries("blockstorage_base__event_base_diagnostics" PUBLIC
     "blockstorage_base__base"
     "blockstorage_metrics__metrics"
-)
-target_include_directories("blockstorage_base__event_base_diagnostics" PUBLIC
-    "blockstorage/base"
 )
 set_target_properties("blockstorage_base__event_base_diagnostics" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -126,13 +125,10 @@ add_library("blockstorage_base__fibercallback"
     "blockstorage/base/FiberCallback.h"
     "blockstorage/base/FiberCallbackTimer.h"
 )
-target_link_libraries("blockstorage_base__fibercallback" 
+target_link_libraries("blockstorage_base__fibercallback" PUBLIC
     "blockstorage_base__base"
     "blockstorage_base__fiberdiagnostics"
     "blockstorage_metrics__metrics"
-)
-target_include_directories("blockstorage_base__fibercallback" PUBLIC
-    "blockstorage/base"
 )
 set_target_properties("blockstorage_base__fibercallback" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -140,13 +136,10 @@ add_library("blockstorage_base__fiberdiagnostics"
     "blockstorage/base/FiberDiagnostics.cpp"
     "blockstorage/base/FiberDiagnostics.h"
 )
-target_link_libraries("blockstorage_base__fiberdiagnostics" 
+target_link_libraries("blockstorage_base__fiberdiagnostics" PUBLIC
     "blockstorage_base__base"
     "blockstorage_base__event_base_diagnostics"
     "blockstorage_metrics__metrics"
-)
-target_include_directories("blockstorage_base__fiberdiagnostics" PUBLIC
-    "blockstorage/base"
 )
 set_target_properties("blockstorage_base__fiberdiagnostics" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -154,7 +147,7 @@ add_library("blockstorage_base__numa_based_fiber_manager_factory"
     "blockstorage/base/NumaBasedFiberManagerFactory.cpp"
     "blockstorage/base/NumaBasedFiberManagerFactory.h"
 )
-target_link_libraries("blockstorage_base__numa_based_fiber_manager_factory" 
+target_link_libraries("blockstorage_base__numa_based_fiber_manager_factory" PUBLIC
     "blockstorage_base__base"
     "blockstorage_base__fiber_delay_timer_mgr"
     "blockstorage_base__request_tracing"
@@ -162,16 +155,13 @@ target_link_libraries("blockstorage_base__numa_based_fiber_manager_factory"
     "third-party_google-gflags__google-gflags"
     "third-party_google-glog__google-glog"
 )
-target_include_directories("blockstorage_base__numa_based_fiber_manager_factory" PUBLIC
-    "blockstorage/base"
-)
 set_target_properties("blockstorage_base__numa_based_fiber_manager_factory" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_base__nvmeUtil" 
     "blockstorage/base/NvmeUtil.cpp"
     "blockstorage/base/NvmeUtil.h"
 )
-target_link_libraries("blockstorage_base__nvmeUtil" 
+target_link_libraries("blockstorage_base__nvmeUtil" PUBLIC
     "blockstorage_async__blockdevice"
     "blockstorage_async__blockstoragespdk"
     "blockstorage_base__protobuf_utils"
@@ -179,18 +169,12 @@ target_link_libraries("blockstorage_base__nvmeUtil"
     "bsv2_java_proto__management-proto"
     "third-party_google-glog__google-glog"
 )
-target_include_directories("blockstorage_base__nvmeUtil" PUBLIC
-    "blockstorage/base"
-)
 set_target_properties("blockstorage_base__nvmeUtil" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_base__protobuf_utils" 
     "blockstorage/base/ProtobufUtils.h"
 )
-target_link_libraries("blockstorage_base__protobuf_utils" 
-)
-target_include_directories("blockstorage_base__protobuf_utils" PUBLIC
-    "blockstorage/base"
+target_link_libraries("blockstorage_base__protobuf_utils" PUBLIC
 )
 set_target_properties("blockstorage_base__protobuf_utils" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -198,13 +182,10 @@ add_library("blockstorage_base__threadpool"
     "blockstorage/base/ThreadPoolExecutor.cpp"
     "blockstorage/base/ThreadPoolExecutor.h"
 )
-target_link_libraries("blockstorage_base__threadpool" 
+target_link_libraries("blockstorage_base__threadpool" PUBLIC
     "blockstorage_base__base"
     "blockstorage_base__fiberdiagnostics"
     "blockstorage_metrics__metrics"
-)
-target_include_directories("blockstorage_base__threadpool" PUBLIC
-    "blockstorage/base"
 )
 set_target_properties("blockstorage_base__threadpool" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -212,12 +193,9 @@ add_library("blockstorage_casper__mockproxy"
     "blockstorage/casper/MockCasperProxy.cpp"
     "blockstorage/casper/MockCasperProxy.h"
 )
-target_link_libraries("blockstorage_casper__mockproxy" 
+target_link_libraries("blockstorage_casper__mockproxy" PUBLIC
     "blockstorage_async__async"
     "blockstorage_casper__casper"
-)
-target_include_directories("blockstorage_casper__mockproxy" PUBLIC
-    "blockstorage/casper"
 )
 set_target_properties("blockstorage_casper__mockproxy" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -243,7 +221,7 @@ add_library("blockstorage_client_loadgen__loadgen-client"
     "blockstorage/client/loadgen/LoadGeneratorVisual.cpp"
     "blockstorage/client/loadgen/LoadGeneratorVisual.h"
 )
-target_link_libraries("blockstorage_client_loadgen__loadgen-client" 
+target_link_libraries("blockstorage_client_loadgen__loadgen-client" PUBLIC
     "blockstorage_async__async"
     "blockstorage_base__base"
     "blockstorage_base__fuzz"
@@ -255,9 +233,6 @@ target_link_libraries("blockstorage_client_loadgen__loadgen-client"
     "blockstorage_test_fiu__fiu_extent_client_cpp"
     "folly__folly"
 )
-target_include_directories("blockstorage_client_loadgen__loadgen-client" PUBLIC
-    "blockstorage/client/loadgen"
-)
 set_target_properties("blockstorage_client_loadgen__loadgen-client" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_extentserver_block__block" 
@@ -266,11 +241,8 @@ add_library("blockstorage_extentserver_block__block"
     "blockstorage/extentserver/block/BlockLeaderCtl.cpp"
     "blockstorage/extentserver/block/BlockLeaderCtl.h"
 )
-target_link_libraries("blockstorage_extentserver_block__block" 
+target_link_libraries("blockstorage_extentserver_block__block" PUBLIC
     "blockstorage_extentserver__base-ctl"
-)
-target_include_directories("blockstorage_extentserver_block__block" PUBLIC
-    "blockstorage/extentserver/block"
 )
 set_target_properties("blockstorage_extentserver_block__block" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -280,11 +252,8 @@ add_library("blockstorage_extentserver_chunk__chunk"
     "blockstorage/extentserver/chunk/ChunkLeaderCtl.cpp"
     "blockstorage/extentserver/chunk/ChunkLeaderCtl.h"
 )
-target_link_libraries("blockstorage_extentserver_chunk__chunk" 
+target_link_libraries("blockstorage_extentserver_chunk__chunk" PUBLIC
     "blockstorage_extentserver__base-ctl"
-)
-target_include_directories("blockstorage_extentserver_chunk__chunk" PUBLIC
-    "blockstorage/extentserver/chunk"
 )
 set_target_properties("blockstorage_extentserver_chunk__chunk" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -314,7 +283,7 @@ add_library("blockstorage_message__channel"
     "blockstorage/message/TransportStream.cpp"
     "blockstorage/message/TransportStream.h"
 )
-target_link_libraries("blockstorage_message__channel" 
+target_link_libraries("blockstorage_message__channel" PUBLIC
     "blockstorage_async__async"
     "blockstorage_base__base"
     "blockstorage_base__fibercallback"
@@ -332,9 +301,6 @@ target_link_libraries("blockstorage_message__channel"
     "third-party_google-gtest__gtest_prod"
     "third-party_libfiu__libfiu"
 )
-target_include_directories("blockstorage_message__channel" PUBLIC
-    "blockstorage/message"
-)
 set_target_properties("blockstorage_message__channel" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_metadata__metadata" 
@@ -349,7 +315,7 @@ add_library("blockstorage_metadata__metadata"
     "blockstorage/metadata/Utils.cpp"
     "blockstorage/metadata/Utils.h"
 )
-target_link_libraries("blockstorage_metadata__metadata" 
+target_link_libraries("blockstorage_metadata__metadata" PUBLIC
     "blockstorage_base__base"
     "blockstorage_base__fibercallback"
     "blockstorage_base_ec__ec"
@@ -364,16 +330,13 @@ target_link_libraries("blockstorage_metadata__metadata"
     "third-party_google-glog__google-glog"
     "third-party_libfiu__libfiu"
 )
-target_include_directories("blockstorage_metadata__metadata" PUBLIC
-    "blockstorage/metadata"
-)
 set_target_properties("blockstorage_metadata__metadata" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_probe__blockdeviceprobe" 
     "blockstorage/probe/BlockDeviceProbe.cpp"
     "blockstorage/probe/BlockDeviceProbe.h"
 )
-target_link_libraries("blockstorage_probe__blockdeviceprobe" 
+target_link_libraries("blockstorage_probe__blockdeviceprobe" PUBLIC
     "blockstorage_async__async"
     "blockstorage_async__blockdevice"
     "blockstorage_base__base"
@@ -383,9 +346,6 @@ target_link_libraries("blockstorage_probe__blockdeviceprobe"
     "bsv2_java_proto__management-proto"
     "third-party_google-glog__google-glog"
 )
-target_include_directories("blockstorage_probe__blockdeviceprobe" PUBLIC
-    "blockstorage/probe"
-)
 set_target_properties("blockstorage_probe__blockdeviceprobe" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_probe__probe" 
@@ -393,7 +353,7 @@ add_library("blockstorage_probe__probe"
     "blockstorage/probe/ProbeSvc.cpp"
     "blockstorage/probe/ProbeSvc.h"
 )
-target_link_libraries("blockstorage_probe__probe" 
+target_link_libraries("blockstorage_probe__probe" PUBLIC
     "blockstorage_async__async"
     "blockstorage_base__base"
     "blockstorage_base__fibercallback"
@@ -404,23 +364,17 @@ target_link_libraries("blockstorage_probe__probe"
     "bsv2_java_proto__management-proto"
     "third-party_google-glog__google-glog"
 )
-target_include_directories("blockstorage_probe__probe" PUBLIC
-    "blockstorage/probe"
-)
 set_target_properties("blockstorage_probe__probe" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_replication__replication" 
     "blockstorage/replication/Replication.cpp"
 )
-target_link_libraries("blockstorage_replication__replication" 
+target_link_libraries("blockstorage_replication__replication" PUBLIC
     "blockstorage_replication__common"
     "blockstorage_replication_block_acceptor__acceptor"
     "blockstorage_replication_block_leader__leader"
     "blockstorage_replication_chunk_acceptor__acceptor"
     "blockstorage_replication_chunk_leader__leader"
-)
-target_include_directories("blockstorage_replication__replication" PUBLIC
-    "blockstorage/replication"
 )
 set_target_properties("blockstorage_replication__replication" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -431,16 +385,13 @@ add_library("blockstorage_socket__socket"
     "blockstorage/socket/UnixSocket.cpp"
     "blockstorage/socket/UnixSocket.h"
 )
-target_link_libraries("blockstorage_socket__socket" 
+target_link_libraries("blockstorage_socket__socket" PUBLIC
     "blockstorage_base__base"
     "blockstorage_message__fibersocket"
     "blockstorage_metrics__metrics"
     "folly__folly"
     "third-party_google-gflags__google-gflags"
     "third-party_google-glog__google-glog"
-)
-target_include_directories("blockstorage_socket__socket" PUBLIC
-    "blockstorage/socket"
 )
 set_target_properties("blockstorage_socket__socket" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -451,8 +402,6 @@ target_link_libraries("bsv2_java_proto__management-proto" INTERFACE
     "bsv2_java_proto__persistent_store_cc_protos"
     "bsv2_java_proto__types_cc_protos"
     "bsv2_java_proto__types_v2_cc_protos"
-)
-target_include_directories("bsv2_java_proto__management-proto" PUBLIC
 )
 set_target_properties("bsv2_java_proto__management-proto" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -483,18 +432,7 @@ add_library("third-party_google-gflags__google-gflags"
     "third-party/google-gflags/src/mutex.h"
     "third-party/google-gflags/src/util.h"
 )
-target_link_libraries("third-party_google-gflags__google-gflags" 
-)
-target_include_directories("third-party_google-gflags__google-gflags" PUBLIC
-    "third-party/google-gflags/generated/mipsisa64-octeon-elf/include/gflags"
-    "third-party/google-gflags/generated/x86_64-linux-gnu/private_include"
-    "third-party/google-gflags/generated/mipsisa64-octeon-elf/private_include"
-    "third-party/google-gflags/generated/x86_64-apple-darwin/private_include"
-    "third-party/google-gflags/generated/x86_64-linux-gnu/include/gflags"
-    "third-party/google-gflags/generated/mips64-octeon-linux-gnu/include/gflags"
-    "third-party/google-gflags/generated/mips64-octeon-linux-gnu/private_include"
-    "third-party/google-gflags/generated/x86_64-apple-darwin/include/gflags"
-    "third-party/google-gflags/src"
+target_link_libraries("third-party_google-gflags__google-gflags" PUBLIC
 )
 set_target_properties("third-party_google-gflags__google-gflags" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -550,25 +488,10 @@ add_library("third-party_google-glog__google-glog"
     "third-party/google-glog/src/windows/glog/vlog_is_on.h"
     "third-party/google-glog/src/windows/port.h"
 )
-target_link_libraries("third-party_google-glog__google-glog" 
+target_link_libraries("third-party_google-glog__google-glog" PUBLIC
     "folly__folly-atomic-list"
     "third-party_google-gflags__google-gflags"
     "third-party_libunwind__libunwind"
-)
-target_include_directories("third-party_google-glog__google-glog" PUBLIC
-    "third-party/google-glog/src/windows"
-    "third-party/google-glog/generated/x86_64-linux-gnu/include/glog"
-    "third-party/google-glog/src/base"
-    "third-party/google-glog/src/glog"
-    "third-party/google-glog/generated/x86_64-apple-darwin/private_include"
-    "third-party/google-glog/generated/x86_64-apple-darwin/include/glog"
-    "third-party/google-glog/src"
-    "third-party/google-glog/generated/mips64-octeon-linux-gnu/private_include"
-    "third-party/google-glog/generated/mipsisa64-octeon-elf/private_include"
-    "third-party/google-glog/generated/mips64-octeon-linux-gnu/include/glog"
-    "third-party/google-glog/generated/x86_64-linux-gnu/private_include"
-    "third-party/google-glog/src/windows/glog"
-    "third-party/google-glog/generated/mipsisa64-octeon-elf/include/glog"
 )
 set_target_properties("third-party_google-glog__google-glog" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -586,10 +509,7 @@ add_library("third-party_libfiu__libfiu"
     "third-party/libfiu/libfiu/wtable.c"
     "third-party/libfiu/libfiu/wtable.h"
 )
-target_link_libraries("third-party_libfiu__libfiu" 
-)
-target_include_directories("third-party_libfiu__libfiu" PUBLIC
-    "third-party/libfiu/libfiu"
+target_link_libraries("third-party_libfiu__libfiu" PUBLIC
 )
 set_target_properties("third-party_libfiu__libfiu" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -601,36 +521,27 @@ add_library("blockstorage_async__async"
     "blockstorage/async/AsyncResultCompletionManager.h"
     "blockstorage/async/FairScheduler.h"
 )
-target_link_libraries("blockstorage_async__async" 
+target_link_libraries("blockstorage_async__async" PUBLIC
     "blockstorage_base__base"
     "third-party_google-glog__google-glog"
-)
-target_include_directories("blockstorage_async__async" PUBLIC
-    "blockstorage/async"
 )
 set_target_properties("blockstorage_async__async" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_async__blockstoragespdk" 
     "blockstorage/async/SpdkHooks.cpp"
 )
-target_link_libraries("blockstorage_async__blockstoragespdk" 
+target_link_libraries("blockstorage_async__blockstoragespdk" PUBLIC
     "blockstorage_async__spdkhooks"
     "spdk__spdk"
-)
-target_include_directories("blockstorage_async__blockstoragespdk" PUBLIC
-    "blockstorage/async"
 )
 set_target_properties("blockstorage_async__blockstoragespdk" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_async__spdkhooks" 
     "blockstorage/async/SpdkHooks.cpp"
 )
-target_link_libraries("blockstorage_async__spdkhooks" 
+target_link_libraries("blockstorage_async__spdkhooks" PUBLIC
     "blockstorage_base__base"
     "third-party_google-glog__google-glog"
-)
-target_include_directories("blockstorage_async__spdkhooks" PUBLIC
-    "blockstorage/async"
 )
 set_target_properties("blockstorage_async__spdkhooks" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -697,7 +608,7 @@ add_library("blockstorage_base__base"
     "blockstorage/base/template-utils.h"
     "blockstorage/base/types.hpp"
 )
-target_link_libraries("blockstorage_base__base" 
+target_link_libraries("blockstorage_base__base" PUBLIC
     "blockstorage_base__base_capnp"
     "blockstorage_base__jemalloc-hooks"
     "blockstorage_base__numa_affinity"
@@ -712,9 +623,6 @@ target_link_libraries("blockstorage_base__base"
     "third-party_libfiu__libfiu"
     "third-party_safelogger__safelogger"
     "third-party_zstd__zstd"
-)
-target_include_directories("blockstorage_base__base" PUBLIC
-    "blockstorage/base"
 )
 set_target_properties("blockstorage_base__base" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -735,7 +643,7 @@ add_library("blockstorage_metrics__metrics"
     "blockstorage/metrics/Quantile.cpp"
     "blockstorage/metrics/Quantile.h"
 )
-target_link_libraries("blockstorage_metrics__metrics" 
+target_link_libraries("blockstorage_metrics__metrics" PUBLIC
     "blockstorage_async__async"
     "blockstorage_base__base"
     "blockstorage_base__protobuf_utils"
@@ -745,20 +653,14 @@ target_link_libraries("blockstorage_metrics__metrics"
     "third-party_google-glog__google-glog"
     "third-party_tdigest__tdigest"
 )
-target_include_directories("blockstorage_metrics__metrics" PUBLIC
-    "blockstorage/metrics"
-)
 set_target_properties("blockstorage_metrics__metrics" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_base__fiber_delay_timer_mgr" 
     "blockstorage/base/FiberDelayTimerMgr.cpp"
     "blockstorage/base/FiberDelayTimerMgr.h"
 )
-target_link_libraries("blockstorage_base__fiber_delay_timer_mgr" 
+target_link_libraries("blockstorage_base__fiber_delay_timer_mgr" PUBLIC
     "blockstorage_base__fibercallback"
-)
-target_include_directories("blockstorage_base__fiber_delay_timer_mgr" PUBLIC
-    "blockstorage/base"
 )
 set_target_properties("blockstorage_base__fiber_delay_timer_mgr" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -770,12 +672,9 @@ add_library("blockstorage_base__request_tracing"
     "blockstorage/base/Shutdown.h"
     "blockstorage/base/class.hpp"
 )
-target_link_libraries("blockstorage_base__request_tracing" 
+target_link_libraries("blockstorage_base__request_tracing" PUBLIC
     "folly__folly"
     "jaeger-client-cpp__jaeger"
-)
-target_include_directories("blockstorage_base__request_tracing" PUBLIC
-    "blockstorage/base"
 )
 set_target_properties("blockstorage_base__request_tracing" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -785,7 +684,7 @@ add_library("blockstorage_casper__casper"
     "blockstorage/casper/CasperUtil.cpp"
     "blockstorage/casper/CasperUtil.h"
 )
-target_link_libraries("blockstorage_casper__casper" 
+target_link_libraries("blockstorage_casper__casper" PUBLIC
     "blockstorage_base__base"
     "blockstorage_base__fuzz"
     "blockstorage_base__threadpool"
@@ -793,20 +692,14 @@ target_link_libraries("blockstorage_casper__casper"
     "blockstorage_metrics__metrics"
     "bsv2_java_proto__casper-proxy-proto"
 )
-target_include_directories("blockstorage_casper__casper" PUBLIC
-    "blockstorage/casper"
-)
 set_target_properties("blockstorage_casper__casper" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_base__fuzz" 
     "blockstorage/base/Fuzz.cpp"
     "blockstorage/base/Fuzz.h"
 )
-target_link_libraries("blockstorage_base__fuzz" 
+target_link_libraries("blockstorage_base__fuzz" PUBLIC
     "blockstorage_base__fiber_delay_timer_mgr"
-)
-target_include_directories("blockstorage_base__fuzz" PUBLIC
-    "blockstorage/base"
 )
 set_target_properties("blockstorage_base__fuzz" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -819,7 +712,7 @@ add_library("blockstorage_client__client"
     "blockstorage/client/CompressionSampler.cpp"
     "blockstorage/client/CompressionSampler.h"
 )
-target_link_libraries("blockstorage_client__client" 
+target_link_libraries("blockstorage_client__client" PUBLIC
     "blockstorage_async__async"
     "blockstorage_base__base"
     "blockstorage_base__lba_mapping_status"
@@ -830,22 +723,16 @@ target_link_libraries("blockstorage_client__client"
     "blockstorage_replication__Leader_capnp"
     "blockstorage_replication_block__PersistentReservation_capnp"
 )
-target_include_directories("blockstorage_client__client" PUBLIC
-    "blockstorage/client"
-)
 set_target_properties("blockstorage_client__client" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_replication__Leader_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/Leader.capnp.h"
 )
-target_link_libraries("blockstorage_replication__Leader_capnp" 
+target_link_libraries("blockstorage_replication__Leader_capnp" PUBLIC
     "blockstorage_base__base_capnp"
     "blockstorage_replication__Common_capnp"
     "blockstorage_replication__Types_capnp"
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_replication__Leader_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication"
 )
 set_target_properties("blockstorage_replication__Leader_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -853,12 +740,9 @@ add_library("blockstorage_test_fiu__fiu_extent_client_cpp"
     "blockstorage/test/fiu/FiuExtentClient.cpp"
     "blockstorage/test/fiu/FiuExtentClient.h"
 )
-target_link_libraries("blockstorage_test_fiu__fiu_extent_client_cpp" 
+target_link_libraries("blockstorage_test_fiu__fiu_extent_client_cpp" PUBLIC
     "blockstorage_base__base"
     "blockstorage_message__fibersocket"
-)
-target_include_directories("blockstorage_test_fiu__fiu_extent_client_cpp" PUBLIC
-    "blockstorage/test/fiu"
 )
 set_target_properties("blockstorage_test_fiu__fiu_extent_client_cpp" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2003,7 +1887,7 @@ add_library("folly__folly"
     "folly/folly/tracing/StaticTracepoint.h"
     "folly/generated/x86_64-linux-gnu/folly/folly-config.h"
 )
-target_link_libraries("folly__folly" 
+target_link_libraries("folly__folly" PUBLIC
     "third-party_double-conversion__double-conversion"
     "third-party_google-gflags__google-gflags"
     "third-party_google-glog__google-glog"
@@ -2011,71 +1895,6 @@ target_link_libraries("folly__folly"
     "third-party_lz4__lz4"
     "third-party_safelogger__safelogger"
     "third-party_zlib__zlib"
-)
-target_include_directories("folly__folly" PUBLIC
-    "folly/folly/concurrency/detail"
-    "folly/folly/experimental/channels/detail"
-    "folly/folly/io/async/observer"
-    "folly/folly"
-    "folly/folly/experimental/io"
-    "folly/folly/experimental"
-    "folly/folly/futures"
-    "folly/folly/gen"
-    "folly/folly/chrono"
-    "folly/folly/hash"
-    "folly/folly/compression"
-    "folly/folly/experimental/symbolizer"
-    "folly/folly/functional"
-    "folly/folly/system"
-    "folly/folly/detail/base64_detail"
-    "folly/folly/experimental/flat_combining"
-    "folly/folly/executors/thread_factory"
-    "folly/folly/experimental/coro"
-    "folly/folly/experimental/observer"
-    "folly/folly/fibers"
-    "folly/folly/io"
-    "folly/folly/lang"
-    "folly/folly/synchronization/detail"
-    "folly/folly/memory/detail"
-    "folly/folly/io/async/ssl"
-    "folly/generated/x86_64-linux-gnu/folly"
-    "folly/folly/tracing"
-    "folly/folly/experimental/symbolizer/detail"
-    "folly/folly/portability"
-    "folly/folly/net"
-    "folly/folly/experimental/settings"
-    "folly/folly/synchronization"
-    "folly/folly/experimental/observer/detail"
-    "folly/folly/experimental/settings/detail"
-    "folly/folly/container/detail"
-    "folly/folly/io/coro"
-    "folly/folly/executors/task_queue"
-    "folly/folly/experimental/channels"
-    "folly/folly/experimental/exception_tracer"
-    "folly/folly/memory"
-    "folly/folly/detail"
-    "folly/folly/synchronization/example"
-    "folly/folly/futures/detail"
-    "folly/folly/container"
-    "folly/folly/ext"
-    "folly/folly/concurrency"
-    "folly/folly/poly"
-    "folly/folly/fibers/async"
-    "folly/folly/external/farmhash"
-    "folly/folly/net/detail"
-    "folly/folly/experimental/bser"
-    "folly/folly/experimental/coro/detail"
-    "folly/folly/fibers/detail"
-    "folly/folly/ssl/detail"
-    "folly/folly/stats/detail"
-    "folly/folly/hash/detail"
-    "folly/folly/logging"
-    "folly/folly/executors"
-    "folly/folly/ssl"
-    "folly/folly/init"
-    "folly/folly/stats"
-    "folly/folly/io/async/fdsock"
-    "folly/folly/io/async"
 )
 set_target_properties("folly__folly" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2086,56 +1905,41 @@ add_library("blockstorage_extentserver__base-ctl"
     "blockstorage/extentserver/LeaderCtl-inl.h"
     "blockstorage/extentserver/LeaderCtl.h"
 )
-target_link_libraries("blockstorage_extentserver__base-ctl" 
+target_link_libraries("blockstorage_extentserver__base-ctl" PUBLIC
     "blockstorage_base__base"
     "blockstorage_metadata__metadata"
     "blockstorage_probe__probe"
     "blockstorage_replication__replication"
-)
-target_include_directories("blockstorage_extentserver__base-ctl" PUBLIC
-    "blockstorage/extentserver"
 )
 set_target_properties("blockstorage_extentserver__base-ctl" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_base_test-utils__prod" 
     "blockstorage/base/test-utils/TestHelperProd.h"
 )
-target_link_libraries("blockstorage_base_test-utils__prod" 
-)
-target_include_directories("blockstorage_base_test-utils__prod" PUBLIC
-    "blockstorage/base/test-utils"
+target_link_libraries("blockstorage_base_test-utils__prod" PUBLIC
 )
 set_target_properties("blockstorage_base_test-utils__prod" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_message__channel-error_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/message/ChannelError.capnp.h"
 )
-target_link_libraries("blockstorage_message__channel-error_capnp" 
+target_link_libraries("blockstorage_message__channel-error_capnp" PUBLIC
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_message__channel-error_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/message"
 )
 set_target_properties("blockstorage_message__channel-error_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_message__client-validator" 
     "blockstorage/message/ClientValidator.h"
 )
-target_link_libraries("blockstorage_message__client-validator" 
-)
-target_include_directories("blockstorage_message__client-validator" PUBLIC
-    "blockstorage/message"
+target_link_libraries("blockstorage_message__client-validator" PUBLIC
 )
 set_target_properties("blockstorage_message__client-validator" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_message__discovery_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/message/Discovery.capnp.h"
 )
-target_link_libraries("blockstorage_message__discovery_capnp" 
+target_link_libraries("blockstorage_message__discovery_capnp" PUBLIC
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_message__discovery_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/message"
 )
 set_target_properties("blockstorage_message__discovery_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2144,40 +1948,29 @@ add_library("blockstorage_message__fibersocket"
     "blockstorage/message/FiberSocket.h"
     "blockstorage/message/Socket.h"
 )
-target_link_libraries("blockstorage_message__fibersocket" 
+target_link_libraries("blockstorage_message__fibersocket" PUBLIC
     "blockstorage_base__base"
-)
-target_include_directories("blockstorage_message__fibersocket" PUBLIC
-    "blockstorage/message"
 )
 set_target_properties("blockstorage_message__fibersocket" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_message__typed-message_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/message/TypedMessage.capnp.h"
 )
-target_link_libraries("blockstorage_message__typed-message_capnp" 
+target_link_libraries("blockstorage_message__typed-message_capnp" PUBLIC
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_message__typed-message_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/message"
 )
 set_target_properties("blockstorage_message__typed-message_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("third-party_capnproto__capnproto" INTERFACE
 )
-target_link_libraries("third-party_capnproto__capnproto" 
-)
-target_include_directories("third-party_capnproto__capnproto" PUBLIC
+target_link_libraries("third-party_capnproto__capnproto" INTERFACE
 )
 set_target_properties("third-party_capnproto__capnproto" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("third-party_google-gtest__gtest_prod" 
     "third-party/google-gtest/include/gtest/gtest_prod.h"
 )
-target_link_libraries("third-party_google-gtest__gtest_prod" 
-)
-target_include_directories("third-party_google-gtest__gtest_prod" PUBLIC
-    "third-party/google-gtest/include/gtest"
+target_link_libraries("third-party_google-gtest__gtest_prod" PUBLIC
 )
 set_target_properties("third-party_google-gtest__gtest_prod" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2190,13 +1983,10 @@ add_library("blockstorage_base_ec__ec"
     "blockstorage/base/ec/GF256Gen.h"
     "blockstorage/base/ec/PageCodec.h"
 )
-target_link_libraries("blockstorage_base_ec__ec" 
+target_link_libraries("blockstorage_base_ec__ec" PUBLIC
     "blockstorage_base__base"
     "folly__folly"
     "third-party_safelogger__safelogger"
-)
-target_include_directories("blockstorage_base_ec__ec" PUBLIC
-    "blockstorage/base/ec"
 )
 set_target_properties("blockstorage_base_ec__ec" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2222,7 +2012,7 @@ add_library("blockstorage_encryption__encryption"
     "blockstorage/encryption/VolumeKeyDecryptClient.cpp"
     "blockstorage/encryption/VolumeKeyDecryptClient.h"
 )
-target_link_libraries("blockstorage_encryption__encryption" 
+target_link_libraries("blockstorage_encryption__encryption" PUBLIC
     "blockstorage_base__base"
     "blockstorage_base__protobuf_utils"
     "blockstorage_base__threadpool"
@@ -2231,19 +2021,13 @@ target_link_libraries("blockstorage_encryption__encryption"
     "bsv2_java_proto__kms-proxy-proto"
     "third-party_libfiu__libfiu"
 )
-target_include_directories("blockstorage_encryption__encryption" PUBLIC
-    "blockstorage/encryption"
-)
 set_target_properties("blockstorage_encryption__encryption" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_replication__Types_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/Types.capnp.h"
 )
-target_link_libraries("blockstorage_replication__Types_capnp" 
+target_link_libraries("blockstorage_replication__Types_capnp" PUBLIC
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_replication__Types_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication"
 )
 set_target_properties("blockstorage_replication__Types_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2262,14 +2046,11 @@ add_library("blockstorage_fs__fsinterface"
     "blockstorage/fs/UspMediaIFSAdapter.cpp"
     "blockstorage/fs/UspMediaIFSAdapter.h"
 )
-target_link_libraries("blockstorage_fs__fsinterface" 
+target_link_libraries("blockstorage_fs__fsinterface" PUBLIC
     "blockstorage_async__async"
     "blockstorage_async__blockdevice"
     "blockstorage_base__base"
     "blockstorage_base__fiber_delay_timer_mgr"
-)
-target_include_directories("blockstorage_fs__fsinterface" PUBLIC
-    "blockstorage/fs"
 )
 set_target_properties("blockstorage_fs__fsinterface" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2307,7 +2088,7 @@ add_library("blockstorage_logfs__logfs"
     "blockstorage/logfs/ReadCtl.h"
     "blockstorage/logfs/RefcountMap.h"
 )
-target_link_libraries("blockstorage_logfs__logfs" 
+target_link_libraries("blockstorage_logfs__logfs" PUBLIC
     "blockstorage_async__async"
     "blockstorage_async__blockdevice"
     "blockstorage_base__base"
@@ -2319,9 +2100,6 @@ target_link_libraries("blockstorage_logfs__logfs"
     "third-party_capnproto__capnproto"
     "third-party_google-glog__google-glog"
     "third-party_sparsepp__sparsepp"
-)
-target_include_directories("blockstorage_logfs__logfs" PUBLIC
-    "blockstorage/logfs"
 )
 set_target_properties("blockstorage_logfs__logfs" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2342,7 +2120,7 @@ add_library("blockstorage_replication__common"
     "blockstorage/replication/RestoreClient.cpp"
     "blockstorage/replication/RestoreClient.h"
 )
-target_link_libraries("blockstorage_replication__common" 
+target_link_libraries("blockstorage_replication__common" PUBLIC
     "blockstorage_async__async"
     "blockstorage_base__request_tracing"
     "blockstorage_base__token_bucket"
@@ -2361,9 +2139,6 @@ target_link_libraries("blockstorage_replication__common"
     "third-party_google-gflags__google-gflags"
     "third-party_google-glog__google-glog"
     "third-party_libfiu__libfiu"
-)
-target_include_directories("blockstorage_replication__common" PUBLIC
-    "blockstorage/replication"
 )
 set_target_properties("blockstorage_replication__common" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2385,13 +2160,10 @@ add_library("blockstorage_replication_block_acceptor__acceptor"
     "blockstorage/replication/block/acceptor/UnmappedBlocksHydrator.h"
     "blockstorage/replication/block/acceptor/XRRChunkDownloader.h"
 )
-target_link_libraries("blockstorage_replication_block_acceptor__acceptor" 
+target_link_libraries("blockstorage_replication_block_acceptor__acceptor" PUBLIC
     "blockstorage_base__lba_mapping_status"
     "blockstorage_replication_acceptor__acceptor"
     "blockstorage_replication_block__common"
-)
-target_include_directories("blockstorage_replication_block_acceptor__acceptor" PUBLIC
-    "blockstorage/replication/block/acceptor"
 )
 set_target_properties("blockstorage_replication_block_acceptor__acceptor" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2434,12 +2206,9 @@ add_library("blockstorage_replication_block_leader__leader"
     "blockstorage/replication/block/leader/XRRVolumeLeaderComponent.cpp"
     "blockstorage/replication/block/leader/XRRVolumeLeaderComponent.h"
 )
-target_link_libraries("blockstorage_replication_block_leader__leader" 
+target_link_libraries("blockstorage_replication_block_leader__leader" PUBLIC
     "blockstorage_replication_block__common"
     "blockstorage_replication_leader__leader"
-)
-target_include_directories("blockstorage_replication_block_leader__leader" PUBLIC
-    "blockstorage/replication/block/leader"
 )
 set_target_properties("blockstorage_replication_block_leader__leader" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2481,14 +2250,10 @@ add_library("blockstorage_replication_chunk_acceptor__acceptor"
     "blockstorage/replication/chunk/acceptor/ChunkConsistencyChecker.cpp"
     "blockstorage/replication/chunk/acceptor/ChunkConsistencyChecker.h"
 )
-target_link_libraries("blockstorage_replication_chunk_acceptor__acceptor" 
+target_link_libraries("blockstorage_replication_chunk_acceptor__acceptor" PUBLIC
     "blockstorage_replication_acceptor__acceptor"
     "blockstorage_replication_chunk__common"
     "blockstorage_replication_chunk_acceptor__LSMHeader_capnp"
-)
-target_include_directories("blockstorage_replication_chunk_acceptor__acceptor" PUBLIC
-    "blockstorage/replication/chunk/acceptor"
-    "blockstorage/replication/chunk/acceptor/CheckpointMetadataDB"
 )
 set_target_properties("blockstorage_replication_chunk_acceptor__acceptor" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2500,12 +2265,9 @@ add_library("blockstorage_replication_chunk_leader__leader"
     "blockstorage/replication/chunk/leader/ChunkRequestsHelper.cpp"
     "blockstorage/replication/chunk/leader/ChunkRequestsHelper.h"
 )
-target_link_libraries("blockstorage_replication_chunk_leader__leader" 
+target_link_libraries("blockstorage_replication_chunk_leader__leader" PUBLIC
     "blockstorage_replication_chunk__common"
     "blockstorage_replication_leader__leader"
-)
-target_include_directories("blockstorage_replication_chunk_leader__leader" PUBLIC
-    "blockstorage/replication/chunk/leader"
 )
 set_target_properties("blockstorage_replication_chunk_leader__leader" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2513,7 +2275,7 @@ add_library("bsv2_java_proto__agent_cc_protos"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/agent.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/agent.pb.h"
 )
-target_link_libraries("bsv2_java_proto__agent_cc_protos" 
+target_link_libraries("bsv2_java_proto__agent_cc_protos" PUBLIC
     "bsv2_java_proto__extent_cc_protos"
     "bsv2_java_proto__extent_probe_cc_protos"
     "bsv2_java_proto__light_probe_cc_protos"
@@ -2524,21 +2286,15 @@ target_link_libraries("bsv2_java_proto__agent_cc_protos"
     "bsv2_java_proto__types_v2_cc_protos"
     "bsv2_java_proto__usp_client_cc_protos"
 )
-target_include_directories("bsv2_java_proto__agent_cc_protos" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto"
-)
 set_target_properties("bsv2_java_proto__agent_cc_protos" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("bsv2_java_proto__persistent_store_cc_protos" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/persistent_store.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/persistent_store.pb.h"
 )
-target_link_libraries("bsv2_java_proto__persistent_store_cc_protos" 
+target_link_libraries("bsv2_java_proto__persistent_store_cc_protos" PUBLIC
     "bsv2_java_proto__types_cc_protos"
     "bsv2_java_proto__types_v2_cc_protos"
-)
-target_include_directories("bsv2_java_proto__persistent_store_cc_protos" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto"
 )
 set_target_properties("bsv2_java_proto__persistent_store_cc_protos" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2546,10 +2302,7 @@ add_library("bsv2_java_proto__types_cc_protos"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/types.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/types.pb.h"
 )
-target_link_libraries("bsv2_java_proto__types_cc_protos" 
-)
-target_include_directories("bsv2_java_proto__types_cc_protos" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto"
+target_link_libraries("bsv2_java_proto__types_cc_protos" PUBLIC
 )
 set_target_properties("bsv2_java_proto__types_cc_protos" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2557,32 +2310,23 @@ add_library("bsv2_java_proto__types_v2_cc_protos"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/typesV2.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/typesV2.pb.h"
 )
-target_link_libraries("bsv2_java_proto__types_v2_cc_protos" 
+target_link_libraries("bsv2_java_proto__types_v2_cc_protos" PUBLIC
     "bsv2_java_proto__types_cc_protos"
-)
-target_include_directories("bsv2_java_proto__types_v2_cc_protos" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto"
 )
 set_target_properties("bsv2_java_proto__types_v2_cc_protos" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("folly__folly-atomic-list" 
     "folly/folly/AtomicIntrusiveLinkedList.h"
 )
-target_link_libraries("folly__folly-atomic-list" 
-)
-target_include_directories("folly__folly-atomic-list" PUBLIC
-    "folly/folly"
+target_link_libraries("folly__folly-atomic-list" PUBLIC
 )
 set_target_properties("folly__folly-atomic-list" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("third-party_libunwind__libunwind" 
     "third-party/libunwind/src/elfxx.c"
 )
-target_link_libraries("third-party_libunwind__libunwind" 
+target_link_libraries("third-party_libunwind__libunwind" PUBLIC
     "third-party_xz__xz"
-)
-target_include_directories("third-party_libunwind__libunwind" PUBLIC
-    "third-party/libunwind/src"
 )
 set_target_properties("third-party_libunwind__libunwind" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2654,25 +2398,16 @@ add_library("spdk__spdk"
     "spdk/lib/nvme/nvme_uevent.c"
     "spdk/lib/nvme/nvme_uevent.h"
 )
-target_link_libraries("spdk__spdk" 
+target_link_libraries("spdk__spdk" PUBLIC
     "spdk__spdk_bs"
-)
-target_include_directories("spdk__spdk" PUBLIC
-    "spdk/lib/nvme"
-    "spdk/lib/log"
-    "spdk/include/spdk"
-    "spdk/include/spdk_internal"
 )
 set_target_properties("spdk__spdk" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_base__base_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/base/base.capnp.h"
 )
-target_link_libraries("blockstorage_base__base_capnp" 
+target_link_libraries("blockstorage_base__base_capnp" PUBLIC
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_base__base_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/base"
 )
 set_target_properties("blockstorage_base__base_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2683,14 +2418,11 @@ add_library("blockstorage_base__jemalloc-hooks"
     "blockstorage/base/LockFile.h"
     "blockstorage/base/Malloc.h"
 )
-target_link_libraries("blockstorage_base__jemalloc-hooks" 
+target_link_libraries("blockstorage_base__jemalloc-hooks" PUBLIC
     "folly__folly"
     "third-party_google-gtest__gtest_prod"
     "third-party_jemalloc-github__jemalloc"
     "third-party_safelogger__safelogger"
-)
-target_include_directories("blockstorage_base__jemalloc-hooks" PUBLIC
-    "blockstorage/base"
 )
 set_target_properties("blockstorage_base__jemalloc-hooks" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2699,14 +2431,11 @@ add_library("blockstorage_base__numa_affinity"
     "blockstorage/base/Affinity.h"
     "blockstorage/base/Shutdown.h"
 )
-target_link_libraries("blockstorage_base__numa_affinity" 
+target_link_libraries("blockstorage_base__numa_affinity" PUBLIC
     "blockstorage_base__protobuf_utils"
     "bsv2_java_proto__numa_probe_proto"
     "third-party_google-gflags__google-gflags"
     "third-party_google-glog__google-glog"
-)
-target_include_directories("blockstorage_base__numa_affinity" PUBLIC
-    "blockstorage/base"
 )
 set_target_properties("blockstorage_base__numa_affinity" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2715,20 +2444,14 @@ add_library("blockstorage_base_compress__compress"
     "blockstorage/base/compress/IntegerCodec.h"
     "blockstorage/base/compress/IntegerGroup.h"
 )
-target_link_libraries("blockstorage_base_compress__compress" 
-)
-target_include_directories("blockstorage_base_compress__compress" PUBLIC
-    "blockstorage/base/compress"
+target_link_libraries("blockstorage_base_compress__compress" PUBLIC
 )
 set_target_properties("blockstorage_base_compress__compress" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("third-party_curl__curl" 
     "third-party/curl/empty.cc"
 )
-target_link_libraries("third-party_curl__curl" 
-)
-target_include_directories("third-party_curl__curl" PUBLIC
-    "third-party/curl"
+target_link_libraries("third-party_curl__curl" PUBLIC
 )
 set_target_properties("third-party_curl__curl" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2751,10 +2474,7 @@ add_library("third-party_google-crcutil__google-crcutil"
     "third-party/google-crcutil/code/std_headers.h"
     "third-party/google-crcutil/code/uint128_sse2.h"
 )
-target_link_libraries("third-party_google-crcutil__google-crcutil" 
-)
-target_include_directories("third-party_google-crcutil__google-crcutil" PUBLIC
-    "third-party/google-crcutil/code"
+target_link_libraries("third-party_google-crcutil__google-crcutil" PUBLIC
 )
 set_target_properties("third-party_google-crcutil__google-crcutil" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2764,11 +2484,8 @@ add_library("third-party_safelogger__safelogger"
     "third-party/safelogger/src/safelogger/SafeLogger.h"
     "third-party/safelogger/src/safelogger/StdOutLogger.h"
 )
-target_link_libraries("third-party_safelogger__safelogger" 
+target_link_libraries("third-party_safelogger__safelogger" PUBLIC
     "third-party_google-glog__google-glog"
-)
-target_include_directories("third-party_safelogger__safelogger" PUBLIC
-    "third-party/safelogger/src/safelogger"
 )
 set_target_properties("third-party_safelogger__safelogger" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2833,13 +2550,7 @@ add_library("third-party_zstd__zstd"
     "third-party/zstd/lib/zstd.h"
     "third-party/zstd/lib/zstd_errors.h"
 )
-target_link_libraries("third-party_zstd__zstd" 
-)
-target_include_directories("third-party_zstd__zstd" PUBLIC
-    "third-party/zstd/lib"
-    "third-party/zstd/lib/common"
-    "third-party/zstd/lib/compress"
-    "third-party/zstd/lib/decompress"
+target_link_libraries("third-party_zstd__zstd" PUBLIC
 )
 set_target_properties("third-party_zstd__zstd" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -2848,20 +2559,15 @@ add_library("bsv2_java_proto__metrics-agent-proto" INTERFACE
 target_link_libraries("bsv2_java_proto__metrics-agent-proto" INTERFACE
     "bsv2_java_proto__metrics_agent_cc_protos"
 )
-target_include_directories("bsv2_java_proto__metrics-agent-proto" PUBLIC
-)
 set_target_properties("bsv2_java_proto__metrics-agent-proto" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("third-party_tdigest__tdigest" 
     "third-party/tdigest/tdigest/TDigest.h"
     "third-party/tdigest/tdigest/dummy.cpp"
 )
-target_link_libraries("third-party_tdigest__tdigest" 
+target_link_libraries("third-party_tdigest__tdigest" PUBLIC
     "third-party_google-glog__google-glog"
     "third-party_google-gtest__google-gtest"
-)
-target_include_directories("third-party_tdigest__tdigest" PUBLIC
-    "third-party/tdigest/tdigest"
 )
 set_target_properties("third-party_tdigest__tdigest" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3079,27 +2785,13 @@ add_library("jaeger-client-cpp__jaeger"
     "jaeger-client-cpp/src/jaegertracing/utils/YAML.cpp"
     "jaeger-client-cpp/src/jaegertracing/utils/YAML.h"
 )
-target_link_libraries("jaeger-client-cpp__jaeger" 
+target_link_libraries("jaeger-client-cpp__jaeger" PUBLIC
     "folly__folly"
     "jaeger-client-cpp__generated_headers"
     "json__json"
     "opentracing-cpp__opentracing"
     "thrift__thriftcpp"
     "yaml-cpp__yaml-cpp"
-)
-target_include_directories("jaeger-client-cpp__jaeger" PUBLIC
-    "jaeger-client-cpp/src/jaegertracing/reporters"
-    "jaeger-client-cpp/src/jaegertracing"
-    "jaeger-client-cpp/src/jaegertracing/utils"
-    "jaeger-client-cpp/src/jaegertracing/platform"
-    "jaeger-client-cpp/src/jaegertracing/thrift-gen"
-    "jaeger-client-cpp/src/jaegertracing/samplers"
-    "jaeger-client-cpp/src/jaegertracing/net/http"
-    "jaeger-client-cpp/src/jaegertracing/testutils"
-    "jaeger-client-cpp/src/jaegertracing/baggage"
-    "jaeger-client-cpp/src/jaegertracing/propagation"
-    "jaeger-client-cpp/src/jaegertracing/net"
-    "jaeger-client-cpp/src/jaegertracing/metrics"
 )
 set_target_properties("jaeger-client-cpp__jaeger" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3108,21 +2800,16 @@ add_library("bsv2_java_proto__casper-proxy-proto" INTERFACE
 target_link_libraries("bsv2_java_proto__casper-proxy-proto" INTERFACE
     "bsv2_java_proto__casper_proxy_cc_protos"
 )
-target_include_directories("bsv2_java_proto__casper-proxy-proto" PUBLIC
-)
 set_target_properties("bsv2_java_proto__casper-proxy-proto" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_base__lba_mapping_status" 
     "blockstorage/base/LbaMappingStatusHelpers.cpp"
     "blockstorage/base/LbaMappingStatusHelpers.h"
 )
-target_link_libraries("blockstorage_base__lba_mapping_status" 
+target_link_libraries("blockstorage_base__lba_mapping_status" PUBLIC
     "blockstorage_base__base"
     "blockstorage_metadata__metadata"
     "blockstorage_replication__Common_capnp"
-)
-target_include_directories("blockstorage_base__lba_mapping_status" PUBLIC
-    "blockstorage/base"
 )
 set_target_properties("blockstorage_base__lba_mapping_status" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3130,7 +2817,7 @@ add_library("blockstorage_client__mockserver"
     "blockstorage/client/MockServer.cpp"
     "blockstorage/client/MockServer.h"
 )
-target_link_libraries("blockstorage_client__mockserver" 
+target_link_libraries("blockstorage_client__mockserver" PUBLIC
     "blockstorage_async__async"
     "blockstorage_base__base"
     "blockstorage_base__lba_mapping_status"
@@ -3140,16 +2827,13 @@ target_link_libraries("blockstorage_client__mockserver"
     "blockstorage_replication__Leader_capnp"
     "blockstorage_replication_block__PersistentReservation_capnp"
 )
-target_include_directories("blockstorage_client__mockserver" PUBLIC
-    "blockstorage/client"
-)
 set_target_properties("blockstorage_client__mockserver" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_metadata__leaderwatcher" 
     "blockstorage/metadata/LeaderWatcher.cpp"
     "blockstorage/metadata/LeaderWatcher.h"
 )
-target_link_libraries("blockstorage_metadata__leaderwatcher" 
+target_link_libraries("blockstorage_metadata__leaderwatcher" PUBLIC
     "blockstorage_base__base"
     "blockstorage_base__fibercallback"
     "blockstorage_message__channel"
@@ -3162,31 +2846,22 @@ target_link_libraries("blockstorage_metadata__leaderwatcher"
     "third-party_google-glog__google-glog"
     "third-party_libfiu__libfiu"
 )
-target_include_directories("blockstorage_metadata__leaderwatcher" PUBLIC
-    "blockstorage/metadata"
-)
 set_target_properties("blockstorage_metadata__leaderwatcher" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_replication_block__PersistentReservation_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/block/PersistentReservation.capnp.h"
 )
-target_link_libraries("blockstorage_replication_block__PersistentReservation_capnp" 
+target_link_libraries("blockstorage_replication_block__PersistentReservation_capnp" PUBLIC
     "blockstorage_base__base_capnp"
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_replication_block__PersistentReservation_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/block"
 )
 set_target_properties("blockstorage_replication_block__PersistentReservation_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_replication__Common_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/Common.capnp.h"
 )
-target_link_libraries("blockstorage_replication__Common_capnp" 
+target_link_libraries("blockstorage_replication__Common_capnp" PUBLIC
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_replication__Common_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication"
 )
 set_target_properties("blockstorage_replication__Common_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3210,20 +2885,14 @@ add_library("third-party_double-conversion__double-conversion"
     "third-party/double-conversion/double-conversion/strtod.h"
     "third-party/double-conversion/double-conversion/utils.h"
 )
-target_link_libraries("third-party_double-conversion__double-conversion" 
-)
-target_include_directories("third-party_double-conversion__double-conversion" PUBLIC
-    "third-party/double-conversion/double-conversion"
+target_link_libraries("third-party_double-conversion__double-conversion" PUBLIC
 )
 set_target_properties("third-party_double-conversion__double-conversion" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("third-party_libevent__libevent" 
     "third-party/libevent/empty.cc"
 )
-target_link_libraries("third-party_libevent__libevent" 
-)
-target_include_directories("third-party_libevent__libevent" PUBLIC
-    "third-party/libevent"
+target_link_libraries("third-party_libevent__libevent" PUBLIC
 )
 set_target_properties("third-party_libevent__libevent" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3238,20 +2907,14 @@ add_library("third-party_lz4__lz4"
     "third-party/lz4/lib/xxhash.c"
     "third-party/lz4/lib/xxhash.h"
 )
-target_link_libraries("third-party_lz4__lz4" 
-)
-target_include_directories("third-party_lz4__lz4" PUBLIC
-    "third-party/lz4/lib"
+target_link_libraries("third-party_lz4__lz4" PUBLIC
 )
 set_target_properties("third-party_lz4__lz4" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("third-party_zlib__zlib" 
     "third-party/zlib/empty.cc"
 )
-target_link_libraries("third-party_zlib__zlib" 
-)
-target_include_directories("third-party_zlib__zlib" PUBLIC
-    "third-party/zlib"
+target_link_libraries("third-party_zlib__zlib" PUBLIC
 )
 set_target_properties("third-party_zlib__zlib" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3260,19 +2923,14 @@ add_library("bsv2_java_proto__kms-proxy-proto" INTERFACE
 target_link_libraries("bsv2_java_proto__kms-proxy-proto" INTERFACE
     "bsv2_java_proto__kms_cc_proxy"
 )
-target_include_directories("bsv2_java_proto__kms-proxy-proto" PUBLIC
-)
 set_target_properties("bsv2_java_proto__kms-proxy-proto" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_logfs__LogFSServer_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/logfs/LogFSServer.capnp.h"
 )
-target_link_libraries("blockstorage_logfs__LogFSServer_capnp" 
+target_link_libraries("blockstorage_logfs__LogFSServer_capnp" PUBLIC
     "blockstorage_base__base_capnp"
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_logfs__LogFSServer_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/logfs"
 )
 set_target_properties("blockstorage_logfs__LogFSServer_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3288,10 +2946,7 @@ add_library("third-party_sparsepp__sparsepp"
     "third-party/sparsepp/sparsepp/spp_traits.h"
     "third-party/sparsepp/sparsepp/spp_utils.h"
 )
-target_link_libraries("third-party_sparsepp__sparsepp" 
-)
-target_include_directories("third-party_sparsepp__sparsepp" PUBLIC
-    "third-party/sparsepp/sparsepp"
+target_link_libraries("third-party_sparsepp__sparsepp" PUBLIC
 )
 set_target_properties("third-party_sparsepp__sparsepp" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3300,52 +2955,40 @@ add_library("blockstorage_base__token_bucket"
     "blockstorage/base/TokenBucket.cpp"
     "blockstorage/base/TokenBucket.h"
 )
-target_link_libraries("blockstorage_base__token_bucket" 
+target_link_libraries("blockstorage_base__token_bucket" PUBLIC
     "blockstorage_base__base"
     "blockstorage_base__fiber_delay_timer_mgr"
-)
-target_include_directories("blockstorage_base__token_bucket" PUBLIC
-    "blockstorage/base"
 )
 set_target_properties("blockstorage_base__token_bucket" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_replication__Messages_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/Messages.capnp.h"
 )
-target_link_libraries("blockstorage_replication__Messages_capnp" 
+target_link_libraries("blockstorage_replication__Messages_capnp" PUBLIC
     "blockstorage_base__base_capnp"
     "blockstorage_replication__Common_capnp"
     "blockstorage_replication__Types_capnp"
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_replication__Messages_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication"
 )
 set_target_properties("blockstorage_replication__Messages_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_replication_chunk__ChunkAcceptor_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/chunk/ChunkAcceptor.capnp.h"
 )
-target_link_libraries("blockstorage_replication_chunk__ChunkAcceptor_capnp" 
+target_link_libraries("blockstorage_replication_chunk__ChunkAcceptor_capnp" PUBLIC
     "blockstorage_replication__Messages_capnp"
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_replication_chunk__ChunkAcceptor_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/chunk"
 )
 set_target_properties("blockstorage_replication_chunk__ChunkAcceptor_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_snapshot__messages_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/snapshot/Messages.capnp.h"
 )
-target_link_libraries("blockstorage_snapshot__messages_capnp" 
+target_link_libraries("blockstorage_snapshot__messages_capnp" PUBLIC
     "blockstorage_base__base_capnp"
     "blockstorage_replication__Common_capnp"
     "blockstorage_replication__Messages_capnp"
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_snapshot__messages_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/snapshot"
 )
 set_target_properties("blockstorage_snapshot__messages_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3357,14 +3000,11 @@ add_library("blockstorage_snapshot__snapshot"
     "blockstorage/snapshot/WorkStealingScheduler.cpp"
     "blockstorage/snapshot/WorkStealingScheduler.h"
 )
-target_link_libraries("blockstorage_snapshot__snapshot" 
+target_link_libraries("blockstorage_snapshot__snapshot" PUBLIC
     "blockstorage_base__base"
     "blockstorage_casper__casper"
     "blockstorage_message__channel"
     "blockstorage_metadata__metadata"
-)
-target_include_directories("blockstorage_snapshot__snapshot" PUBLIC
-    "blockstorage/snapshot"
 )
 set_target_properties("blockstorage_snapshot__snapshot" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3388,11 +3028,8 @@ add_library("blockstorage_replication_acceptor__acceptor"
     "blockstorage/replication/acceptor/Wal.cpp"
     "blockstorage/replication/acceptor/Wal.h"
 )
-target_link_libraries("blockstorage_replication_acceptor__acceptor" 
+target_link_libraries("blockstorage_replication_acceptor__acceptor" PUBLIC
     "blockstorage_replication__common"
-)
-target_include_directories("blockstorage_replication_acceptor__acceptor" PUBLIC
-    "blockstorage/replication/acceptor"
 )
 set_target_properties("blockstorage_replication_acceptor__acceptor" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3410,15 +3047,12 @@ add_library("blockstorage_replication_block__common"
     "blockstorage/replication/block/XRRDeltaFormat.cpp"
     "blockstorage/replication/block/XRRDeltaFormat.h"
 )
-target_link_libraries("blockstorage_replication_block__common" 
+target_link_libraries("blockstorage_replication_block__common" PUBLIC
     "blockstorage_replication__common"
     "blockstorage_replication_block__BlockLeader_capnp"
     "blockstorage_replication_block__PersistentReservation_capnp"
     "blockstorage_replication_block__Tiered_capnp"
     "blockstorage_replication_block__XRR_capnp"
-)
-target_include_directories("blockstorage_replication_block__common" PUBLIC
-    "blockstorage/replication/block"
 )
 set_target_properties("blockstorage_replication_block__common" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3430,11 +3064,8 @@ add_library("blockstorage_replication_leader__leader"
     "blockstorage/replication/leader/TieredStorageCache.cpp"
     "blockstorage/replication/leader/TieredStorageCache.h"
 )
-target_link_libraries("blockstorage_replication_leader__leader" 
+target_link_libraries("blockstorage_replication_leader__leader" PUBLIC
     "blockstorage_replication__common"
-)
-target_include_directories("blockstorage_replication_leader__leader" PUBLIC
-    "blockstorage/replication/leader"
 )
 set_target_properties("blockstorage_replication_leader__leader" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3450,26 +3081,20 @@ add_library("blockstorage_replication_chunk__common"
     "blockstorage/replication/chunk/ChunkProposalMetadata.cpp"
     "blockstorage/replication/chunk/ChunkProposalMetadata.h"
 )
-target_link_libraries("blockstorage_replication_chunk__common" 
+target_link_libraries("blockstorage_replication_chunk__common" PUBLIC
     "blockstorage_base_ec__ec"
     "blockstorage_replication__common"
     "blockstorage_replication_chunk__ChunkAcceptorExternal_capnp"
     "blockstorage_replication_chunk__ChunkAcceptor_capnp"
     "blockstorage_replication_chunk__ChunkLeader_capnp"
 )
-target_include_directories("blockstorage_replication_chunk__common" PUBLIC
-    "blockstorage/replication/chunk"
-)
 set_target_properties("blockstorage_replication_chunk__common" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_replication_chunk_acceptor__LSMHeader_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/chunk/acceptor/CheckpointMetadataDB/LSMHeader.capnp.h"
 )
-target_link_libraries("blockstorage_replication_chunk_acceptor__LSMHeader_capnp" 
+target_link_libraries("blockstorage_replication_chunk_acceptor__LSMHeader_capnp" PUBLIC
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_replication_chunk_acceptor__LSMHeader_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/chunk/acceptor/CheckpointMetadataDB"
 )
 set_target_properties("blockstorage_replication_chunk_acceptor__LSMHeader_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3477,11 +3102,8 @@ add_library("bsv2_java_proto__extent_cc_protos"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/extent.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/extent.pb.h"
 )
-target_link_libraries("bsv2_java_proto__extent_cc_protos" 
+target_link_libraries("bsv2_java_proto__extent_cc_protos" PUBLIC
     "bsv2_java_proto__types_cc_protos"
-)
-target_include_directories("bsv2_java_proto__extent_cc_protos" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto"
 )
 set_target_properties("bsv2_java_proto__extent_cc_protos" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3489,11 +3111,8 @@ add_library("bsv2_java_proto__extent_probe_cc_protos"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/extent_probe.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/extent_probe.pb.h"
 )
-target_link_libraries("bsv2_java_proto__extent_probe_cc_protos" 
+target_link_libraries("bsv2_java_proto__extent_probe_cc_protos" PUBLIC
     "bsv2_java_proto__types_cc_protos"
-)
-target_include_directories("bsv2_java_proto__extent_probe_cc_protos" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto"
 )
 set_target_properties("bsv2_java_proto__extent_probe_cc_protos" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3501,14 +3120,11 @@ add_library("bsv2_java_proto__light_probe_cc_protos"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/light_probe.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/light_probe.pb.h"
 )
-target_link_libraries("bsv2_java_proto__light_probe_cc_protos" 
+target_link_libraries("bsv2_java_proto__light_probe_cc_protos" PUBLIC
     "bsv2_java_proto__extent_cc_protos"
     "bsv2_java_proto__extent_probe_cc_protos"
     "bsv2_java_proto__extent_probe_v2_cc_protos"
     "bsv2_java_proto__types_cc_protos"
-)
-target_include_directories("bsv2_java_proto__light_probe_cc_protos" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto"
 )
 set_target_properties("bsv2_java_proto__light_probe_cc_protos" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3516,11 +3132,8 @@ add_library("bsv2_java_proto__numa_probe_cc_protos"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/numa_probe.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/numa_probe.pb.h"
 )
-target_link_libraries("bsv2_java_proto__numa_probe_cc_protos" 
+target_link_libraries("bsv2_java_proto__numa_probe_cc_protos" PUBLIC
     "bsv2_java_proto__types_cc_protos"
-)
-target_include_directories("bsv2_java_proto__numa_probe_cc_protos" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto"
 )
 set_target_properties("bsv2_java_proto__numa_probe_cc_protos" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3528,12 +3141,9 @@ add_library("bsv2_java_proto__target_mgmt_cc_protos"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/target_mgmt.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/target_mgmt.pb.h"
 )
-target_link_libraries("bsv2_java_proto__target_mgmt_cc_protos" 
+target_link_libraries("bsv2_java_proto__target_mgmt_cc_protos" PUBLIC
     "bsv2_java_proto__block_types_v2_cc_protos"
     "bsv2_java_proto__types_cc_protos"
-)
-target_include_directories("bsv2_java_proto__target_mgmt_cc_protos" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto"
 )
 set_target_properties("bsv2_java_proto__target_mgmt_cc_protos" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3541,20 +3151,15 @@ add_library("bsv2_java_proto__usp_client_cc_protos"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/usp_client.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/usp_client.pb.h"
 )
-target_link_libraries("bsv2_java_proto__usp_client_cc_protos" 
+target_link_libraries("bsv2_java_proto__usp_client_cc_protos" PUBLIC
     "bsv2_java_proto__block_types_v2_cc_protos"
     "bsv2_java_proto__types_cc_protos"
-)
-target_include_directories("bsv2_java_proto__usp_client_cc_protos" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto"
 )
 set_target_properties("bsv2_java_proto__usp_client_cc_protos" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("third-party_xz__xz" INTERFACE
 )
-target_link_libraries("third-party_xz__xz" 
-)
-target_include_directories("third-party_xz__xz" PUBLIC
+target_link_libraries("third-party_xz__xz" INTERFACE
 )
 set_target_properties("third-party_xz__xz" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3615,12 +3220,7 @@ add_library("spdk__spdk_bs"
     "spdk/lib/util/pci.c"
     "spdk/lib/util/string.c"
 )
-target_link_libraries("spdk__spdk_bs" 
-)
-target_include_directories("spdk__spdk_bs" PUBLIC
-    "spdk/lib/env_blockstore"
-    "spdk/include/spdk"
-    "spdk/lib/util"
+target_link_libraries("spdk__spdk_bs" PUBLIC
 )
 set_target_properties("spdk__spdk_bs" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3628,8 +3228,6 @@ add_library("third-party_jemalloc-github__jemalloc" INTERFACE
 )
 target_link_libraries("third-party_jemalloc-github__jemalloc" INTERFACE
     "third-party_libunwind__libunwind"
-)
-target_include_directories("third-party_jemalloc-github__jemalloc" PUBLIC
 )
 set_target_properties("third-party_jemalloc-github__jemalloc" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3639,18 +3237,13 @@ target_link_libraries("bsv2_java_proto__numa_probe_proto" INTERFACE
     "bsv2_java_proto__numa_probe_cc_protos"
     "bsv2_java_proto__types_cc_protos"
 )
-target_include_directories("bsv2_java_proto__numa_probe_proto" PUBLIC
-)
 set_target_properties("bsv2_java_proto__numa_probe_proto" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("bsv2_java_proto__metrics_agent_cc_protos" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/metrics_agent.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/metrics_agent.pb.h"
 )
-target_link_libraries("bsv2_java_proto__metrics_agent_cc_protos" 
-)
-target_include_directories("bsv2_java_proto__metrics_agent_cc_protos" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto"
+target_link_libraries("bsv2_java_proto__metrics_agent_cc_protos" PUBLIC
 )
 set_target_properties("bsv2_java_proto__metrics_agent_cc_protos" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3683,32 +3276,22 @@ add_library("third-party_google-gtest__google-gtest"
     "third-party/google-gtest/src/gtest-typed-test.cc"
     "third-party/google-gtest/src/gtest.cc"
 )
-target_link_libraries("third-party_google-gtest__google-gtest" 
+target_link_libraries("third-party_google-gtest__google-gtest" PUBLIC
     "third-party_google-gflags__google-gflags"
     "third-party_google-gtest__gtest_prod"
-)
-target_include_directories("third-party_google-gtest__google-gtest" PUBLIC
-    "third-party/google-gtest/include/gtest/internal"
-    "third-party/google-gtest/include/gtest"
-    "third-party/google-gtest/src"
 )
 set_target_properties("third-party_google-gtest__google-gtest" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("jaeger-client-cpp__generated_headers" INTERFACE
 )
-target_link_libraries("jaeger-client-cpp__generated_headers" 
-)
-target_include_directories("jaeger-client-cpp__generated_headers" PUBLIC
+target_link_libraries("jaeger-client-cpp__generated_headers" INTERFACE
 )
 set_target_properties("jaeger-client-cpp__generated_headers" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("json__json" 
     "json/single_include/nlohmann/json.hpp"
 )
-target_link_libraries("json__json" 
-)
-target_include_directories("json__json" PUBLIC
-    "json/single_include/nlohmann"
+target_link_libraries("json__json" PUBLIC
 )
 set_target_properties("json__json" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3734,16 +3317,9 @@ add_library("opentracing-cpp__opentracing"
     "opentracing-cpp/src/tracer.cpp"
     "opentracing-cpp/src/tracer_factory.cpp"
 )
-target_link_libraries("opentracing-cpp__opentracing" 
+target_link_libraries("opentracing-cpp__opentracing" PUBLIC
     "opentracing-cpp_3rd_party__expected"
     "opentracing-cpp_3rd_party__variant"
-)
-target_include_directories("opentracing-cpp__opentracing" PUBLIC
-    "opentracing-cpp/include/opentracing"
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/opentracing-cpp/include/opentracing"
-    "opentracing-cpp/include/opentracing/ext"
-    "opentracing-cpp/src/ext"
-    "opentracing-cpp/src"
 )
 set_target_properties("opentracing-cpp__opentracing" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3841,18 +3417,7 @@ add_library("thrift__thriftcpp"
     "thrift/lib/cpp/src/thrift/windows/WinFcntl.h"
     "thrift/lib/cpp/src/thrift/windows/config.h"
 )
-target_link_libraries("thrift__thriftcpp" 
-)
-target_include_directories("thrift__thriftcpp" PUBLIC
-    "thrift/lib/cpp/src/thrift/windows"
-    "thrift/lib/cpp/src/thrift/async"
-    "thrift/lib/cpp/src/thrift/server"
-    "thrift/lib/cpp/src/thrift/qt"
-    "thrift/lib/cpp/src/thrift"
-    "thrift/lib/cpp/src/thrift/processor"
-    "thrift/lib/cpp/src/thrift/protocol"
-    "thrift/lib/cpp/src/thrift/transport"
-    "thrift/lib/cpp/src/thrift/concurrency"
+target_link_libraries("thrift__thriftcpp" PUBLIC
 )
 set_target_properties("thrift__thriftcpp" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3946,15 +3511,7 @@ add_library("yaml-cpp__yaml-cpp"
     "yaml-cpp/src/tag.h"
     "yaml-cpp/src/token.h"
 )
-target_link_libraries("yaml-cpp__yaml-cpp" 
-)
-target_include_directories("yaml-cpp__yaml-cpp" PUBLIC
-    "yaml-cpp/src/contrib"
-    "yaml-cpp/include/yaml-cpp/node"
-    "yaml-cpp/include/yaml-cpp/node/detail"
-    "yaml-cpp/include/yaml-cpp"
-    "yaml-cpp/src"
-    "yaml-cpp/include/yaml-cpp/contrib"
+target_link_libraries("yaml-cpp__yaml-cpp" PUBLIC
 )
 set_target_properties("yaml-cpp__yaml-cpp" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3962,11 +3519,8 @@ add_library("bsv2_java_proto__casper_proxy_cc_protos"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/casper_proxy.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/casper_proxy.pb.h"
 )
-target_link_libraries("bsv2_java_proto__casper_proxy_cc_protos" 
+target_link_libraries("bsv2_java_proto__casper_proxy_cc_protos" PUBLIC
     "bsv2_java_proto__types_cc_protos"
-)
-target_include_directories("bsv2_java_proto__casper_proxy_cc_protos" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto"
 )
 set_target_properties("bsv2_java_proto__casper_proxy_cc_protos" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -3974,73 +3528,55 @@ add_library("bsv2_java_proto__kms_cc_proxy"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/kms_proxy.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/kms_proxy.pb.h"
 )
-target_link_libraries("bsv2_java_proto__kms_cc_proxy" 
+target_link_libraries("bsv2_java_proto__kms_cc_proxy" PUBLIC
     "bsv2_java_proto__types_cc_protos"
-)
-target_include_directories("bsv2_java_proto__kms_cc_proxy" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto"
 )
 set_target_properties("bsv2_java_proto__kms_cc_proxy" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_replication_block__BlockLeader_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/block/BlockLeader.capnp.h"
 )
-target_link_libraries("blockstorage_replication_block__BlockLeader_capnp" 
+target_link_libraries("blockstorage_replication_block__BlockLeader_capnp" PUBLIC
     "blockstorage_base__base_capnp"
     "blockstorage_replication_block__BlockTypes_capnp"
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_replication_block__BlockLeader_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/block"
 )
 set_target_properties("blockstorage_replication_block__BlockLeader_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_replication_block__Tiered_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/block/Tiered.capnp.h"
 )
-target_link_libraries("blockstorage_replication_block__Tiered_capnp" 
+target_link_libraries("blockstorage_replication_block__Tiered_capnp" PUBLIC
     "blockstorage_base__base_capnp"
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_replication_block__Tiered_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/block"
 )
 set_target_properties("blockstorage_replication_block__Tiered_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_replication_block__XRR_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/block/XRR.capnp.h"
 )
-target_link_libraries("blockstorage_replication_block__XRR_capnp" 
+target_link_libraries("blockstorage_replication_block__XRR_capnp" PUBLIC
     "blockstorage_base__base_capnp"
     "blockstorage_replication__Types_capnp"
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_replication_block__XRR_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/block"
 )
 set_target_properties("blockstorage_replication_block__XRR_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_replication_chunk__ChunkAcceptorExternal_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/chunk/ChunkAcceptorExternal.capnp.h"
 )
-target_link_libraries("blockstorage_replication_chunk__ChunkAcceptorExternal_capnp" 
+target_link_libraries("blockstorage_replication_chunk__ChunkAcceptorExternal_capnp" PUBLIC
     "blockstorage_replication__Types_capnp"
     "blockstorage_replication_chunk__ChunkAcceptor_capnp"
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_replication_chunk__ChunkAcceptorExternal_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/chunk"
 )
 set_target_properties("blockstorage_replication_chunk__ChunkAcceptorExternal_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_replication_chunk__ChunkLeader_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/chunk/ChunkLeader.capnp.h"
 )
-target_link_libraries("blockstorage_replication_chunk__ChunkLeader_capnp" 
+target_link_libraries("blockstorage_replication_chunk__ChunkLeader_capnp" PUBLIC
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_replication_chunk__ChunkLeader_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/chunk"
 )
 set_target_properties("blockstorage_replication_chunk__ChunkLeader_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4048,13 +3584,10 @@ add_library("bsv2_java_proto__extent_probe_v2_cc_protos"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/extent_probeV2.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/extent_probeV2.pb.h"
 )
-target_link_libraries("bsv2_java_proto__extent_probe_v2_cc_protos" 
+target_link_libraries("bsv2_java_proto__extent_probe_v2_cc_protos" PUBLIC
     "bsv2_java_proto__extent_cc_protos"
     "bsv2_java_proto__extent_probe_cc_protos"
     "bsv2_java_proto__types_cc_protos"
-)
-target_include_directories("bsv2_java_proto__extent_probe_v2_cc_protos" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto"
 )
 set_target_properties("bsv2_java_proto__extent_probe_v2_cc_protos" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4062,21 +3595,15 @@ add_library("bsv2_java_proto__block_types_v2_cc_protos"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/block_typesV2.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto/block_typesV2.pb.h"
 )
-target_link_libraries("bsv2_java_proto__block_types_v2_cc_protos" 
+target_link_libraries("bsv2_java_proto__block_types_v2_cc_protos" PUBLIC
     "bsv2_java_proto__types_cc_protos"
-)
-target_include_directories("bsv2_java_proto__block_types_v2_cc_protos" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/bsv2_java/proto"
 )
 set_target_properties("bsv2_java_proto__block_types_v2_cc_protos" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("opentracing-cpp_3rd_party__expected" 
     "opentracing-cpp/3rd_party/include/opentracing/expected/expected.hpp"
 )
-target_link_libraries("opentracing-cpp_3rd_party__expected" 
-)
-target_include_directories("opentracing-cpp_3rd_party__expected" PUBLIC
-    "opentracing-cpp/3rd_party/include/opentracing/expected"
+target_link_libraries("opentracing-cpp_3rd_party__expected" PUBLIC
 )
 set_target_properties("opentracing-cpp_3rd_party__expected" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4084,23 +3611,17 @@ add_library("opentracing-cpp_3rd_party__variant"
     "opentracing-cpp/3rd_party/include/opentracing/variant/recursive_wrapper.hpp"
     "opentracing-cpp/3rd_party/include/opentracing/variant/variant.hpp"
 )
-target_link_libraries("opentracing-cpp_3rd_party__variant" 
-)
-target_include_directories("opentracing-cpp_3rd_party__variant" PUBLIC
-    "opentracing-cpp/3rd_party/include/opentracing/variant"
+target_link_libraries("opentracing-cpp_3rd_party__variant" PUBLIC
 )
 set_target_properties("opentracing-cpp_3rd_party__variant" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_replication_block__BlockTypes_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/block/BlockTypes.capnp.h"
 )
-target_link_libraries("blockstorage_replication_block__BlockTypes_capnp" 
+target_link_libraries("blockstorage_replication_block__BlockTypes_capnp" PUBLIC
     "blockstorage_base__base_capnp"
     "blockstorage_replication__Types_capnp"
     "third-party_capnproto__capnproto"
-)
-target_include_directories("blockstorage_replication_block__BlockTypes_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/blockstorage/replication/block"
 )
 set_target_properties("blockstorage_replication_block__BlockTypes_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4170,7 +3691,7 @@ add_library("tgt__tgtd"
     "tgt/usr/work.c"
     "tgt/usr/work.h"
 )
-target_link_libraries("tgt__tgtd" 
+target_link_libraries("tgt__tgtd" PUBLIC
     "blockstorage_base__background_logger"
     "blockstorage_base__base"
     "blockstorage_client__client"
@@ -4181,10 +3702,6 @@ target_link_libraries("tgt__tgtd"
     "third-party_libfiu__libfiu"
     "usp-block-client_block-client__block-client"
     "usp-block-client_block-metadata__block-metadata"
-)
-target_include_directories("tgt__tgtd" PUBLIC
-    "tgt/usr/iscsi"
-    "tgt/usr"
 )
 set_target_properties("tgt__tgtd" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4197,7 +3714,7 @@ add_library("usp-block-client_block-client__block-client"
     "usp-block-client/block-client/CompressionSampler.cpp"
     "usp-block-client/block-client/CompressionSampler.h"
 )
-target_link_libraries("usp-block-client_block-client__block-client" 
+target_link_libraries("usp-block-client_block-client__block-client" PUBLIC
     "blockstorage_async__async"
     "blockstorage_base__base"
     "blockstorage_base__lba_mapping_status"
@@ -4210,9 +3727,6 @@ target_link_libraries("usp-block-client_block-client__block-client"
     "usp-block-client_block-metadata__block-metadata"
     "usp-client_usp-client__usp-client-internal"
 )
-target_include_directories("usp-block-client_block-client__block-client" PUBLIC
-    "usp-block-client/block-client"
-)
 set_target_properties("usp-block-client_block-client__block-client" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("usp-block-client_block-metadata__block-metadata" 
@@ -4223,7 +3737,7 @@ add_library("usp-block-client_block-metadata__block-metadata"
     "usp-block-client/block-metadata/BlockTopologyHelper.cpp"
     "usp-block-client/block-metadata/BlockTopologyHelper.h"
 )
-target_link_libraries("usp-block-client_block-metadata__block-metadata" 
+target_link_libraries("usp-block-client_block-metadata__block-metadata" PUBLIC
     "blockstorage_base__base"
     "blockstorage_base__fibercallback"
     "blockstorage_encryption__encryption"
@@ -4238,16 +3752,13 @@ target_link_libraries("usp-block-client_block-metadata__block-metadata"
     "third-party_google-glog__google-glog"
     "third-party_libfiu__libfiu"
 )
-target_include_directories("usp-block-client_block-metadata__block-metadata" PUBLIC
-    "usp-block-client/block-metadata"
-)
 set_target_properties("usp-block-client_block-metadata__block-metadata" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("usp-block-client_block-client__block-mockserver" 
     "usp-block-client/block-client/MockServer.cpp"
     "usp-block-client/block-client/MockServer.h"
 )
-target_link_libraries("usp-block-client_block-client__block-mockserver" 
+target_link_libraries("usp-block-client_block-client__block-mockserver" PUBLIC
     "blockstorage_async__async"
     "blockstorage_base__base"
     "blockstorage_base__lba_mapping_status"
@@ -4257,9 +3768,6 @@ target_link_libraries("usp-block-client_block-client__block-mockserver"
     "blockstorage_replication_block__PersistentReservation_capnp"
     "usp-block-client_block-metadata__block-metadata"
     "usp-client_usp-client__usp-client-internal"
-)
-target_include_directories("usp-block-client_block-client__block-mockserver" PUBLIC
-    "usp-block-client/block-client"
 )
 set_target_properties("usp-block-client_block-client__block-mockserver" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4308,7 +3816,7 @@ add_library("usp-client_usp-client__usp-client-internal"
     "usp-client/usp-client/UspServiceResolver.h"
     "usp-client/usp-client/UspTypes.h"
 )
-target_link_libraries("usp-client_usp-client__usp-client-internal" 
+target_link_libraries("usp-client_usp-client__usp-client-internal" PUBLIC
     "blockstorage_async__async"
     "blockstorage_base__background_logger"
     "blockstorage_base__base"
@@ -4328,22 +3836,16 @@ target_link_libraries("usp-client_usp-client__usp-client-internal"
     "usp-discovery_discovery-cpp-client__namespace-db"
     "usp-extent-picker_usp-extent-picker_server__ExtentPicker_capnp"
 )
-target_include_directories("usp-client_usp-client__usp-client-internal" PUBLIC
-    "usp-client/usp-client"
-)
 set_target_properties("usp-client_usp-client__usp-client-internal" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("blockstorage_replication__extent_group" 
     "blockstorage/replication/ExtentGroup.cpp"
     "blockstorage/replication/ExtentGroup.h"
 )
-target_link_libraries("blockstorage_replication__extent_group" 
+target_link_libraries("blockstorage_replication__extent_group" PUBLIC
     "blockstorage_metadata__metadata"
     "blockstorage_replication__Leader_capnp"
     "folly__folly"
-)
-target_include_directories("blockstorage_replication__extent_group" PUBLIC
-    "blockstorage/replication"
 )
 set_target_properties("blockstorage_replication__extent_group" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4353,12 +3855,9 @@ add_library("usp-discovery_discovery-cpp-client__extent-db"
     "usp-discovery/discovery-cpp-client/ExtentDB.cpp"
     "usp-discovery/discovery-cpp-client/ExtentDB.h"
 )
-target_link_libraries("usp-discovery_discovery-cpp-client__extent-db" 
+target_link_libraries("usp-discovery_discovery-cpp-client__extent-db" PUBLIC
     "usp-discovery_discovery-cpp-client__vilnius-client"
     "usp-discovery_proto__extentdb_proto_cc"
-)
-target_include_directories("usp-discovery_discovery-cpp-client__extent-db" PUBLIC
-    "usp-discovery/discovery-cpp-client"
 )
 set_target_properties("usp-discovery_discovery-cpp-client__extent-db" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4368,12 +3867,9 @@ add_library("usp-discovery_discovery-cpp-client__instance-access-control-db"
     "usp-discovery/discovery-cpp-client/InstanceAccessControlDB.cpp"
     "usp-discovery/discovery-cpp-client/InstanceAccessControlDB.h"
 )
-target_link_libraries("usp-discovery_discovery-cpp-client__instance-access-control-db" 
+target_link_libraries("usp-discovery_discovery-cpp-client__instance-access-control-db" PUBLIC
     "usp-discovery_discovery-cpp-client__vilnius-client"
     "usp-discovery_proto__instanceaccesscontrol_proto_cc"
-)
-target_include_directories("usp-discovery_discovery-cpp-client__instance-access-control-db" PUBLIC
-    "usp-discovery/discovery-cpp-client"
 )
 set_target_properties("usp-discovery_discovery-cpp-client__instance-access-control-db" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4383,23 +3879,17 @@ add_library("usp-discovery_discovery-cpp-client__namespace-db"
     "usp-discovery/discovery-cpp-client/NamespaceDB.cpp"
     "usp-discovery/discovery-cpp-client/NamespaceDB.h"
 )
-target_link_libraries("usp-discovery_discovery-cpp-client__namespace-db" 
+target_link_libraries("usp-discovery_discovery-cpp-client__namespace-db" PUBLIC
     "usp-discovery_discovery-cpp-client__vilnius-client"
     "usp-discovery_proto__namespacedb_proto_cc"
-)
-target_include_directories("usp-discovery_discovery-cpp-client__namespace-db" PUBLIC
-    "usp-discovery/discovery-cpp-client"
 )
 set_target_properties("usp-discovery_discovery-cpp-client__namespace-db" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("usp-extent-picker_usp-extent-picker_server__ExtentPicker_capnp" 
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/usp-extent-picker/usp-extent-picker/server/ExtentPicker.capnp.h"
 )
-target_link_libraries("usp-extent-picker_usp-extent-picker_server__ExtentPicker_capnp" 
+target_link_libraries("usp-extent-picker_usp-extent-picker_server__ExtentPicker_capnp" PUBLIC
     "third-party_capnproto__capnproto"
-)
-target_include_directories("usp-extent-picker_usp-extent-picker_server__ExtentPicker_capnp" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/usp-extent-picker/usp-extent-picker/server"
 )
 set_target_properties("usp-extent-picker_usp-extent-picker_server__ExtentPicker_capnp" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4407,10 +3897,7 @@ add_library("usp-discovery_discovery-cpp-client__vilnius-client"
     "usp-discovery/discovery-cpp-client/VilniusClient.cpp"
     "usp-discovery/discovery-cpp-client/VilniusClient.h"
 )
-target_link_libraries("usp-discovery_discovery-cpp-client__vilnius-client" 
-)
-target_include_directories("usp-discovery_discovery-cpp-client__vilnius-client" PUBLIC
-    "usp-discovery/discovery-cpp-client"
+target_link_libraries("usp-discovery_discovery-cpp-client__vilnius-client" PUBLIC
 )
 set_target_properties("usp-discovery_discovery-cpp-client__vilnius-client" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4418,10 +3905,7 @@ add_library("usp-discovery_proto__extentdb_proto_cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/usp-discovery/proto/extentdb.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/usp-discovery/proto/extentdb.pb.h"
 )
-target_link_libraries("usp-discovery_proto__extentdb_proto_cc" 
-)
-target_include_directories("usp-discovery_proto__extentdb_proto_cc" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/usp-discovery/proto"
+target_link_libraries("usp-discovery_proto__extentdb_proto_cc" PUBLIC
 )
 set_target_properties("usp-discovery_proto__extentdb_proto_cc" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4429,11 +3913,8 @@ add_library("usp-discovery_proto__instanceaccesscontrol_proto_cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/usp-discovery/proto/instanceaccesscontroldb.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/usp-discovery/proto/instanceaccesscontroldb.pb.h"
 )
-target_link_libraries("usp-discovery_proto__instanceaccesscontrol_proto_cc" 
+target_link_libraries("usp-discovery_proto__instanceaccesscontrol_proto_cc" PUBLIC
     "usp-discovery_proto__common_proto_cc"
-)
-target_include_directories("usp-discovery_proto__instanceaccesscontrol_proto_cc" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/usp-discovery/proto"
 )
 set_target_properties("usp-discovery_proto__instanceaccesscontrol_proto_cc" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4441,11 +3922,8 @@ add_library("usp-discovery_proto__namespacedb_proto_cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/usp-discovery/proto/namespacedb.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/usp-discovery/proto/namespacedb.pb.h"
 )
-target_link_libraries("usp-discovery_proto__namespacedb_proto_cc" 
+target_link_libraries("usp-discovery_proto__namespacedb_proto_cc" PUBLIC
     "usp-discovery_proto__common_proto_cc"
-)
-target_include_directories("usp-discovery_proto__namespacedb_proto_cc" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/usp-discovery/proto"
 )
 set_target_properties("usp-discovery_proto__namespacedb_proto_cc" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4453,10 +3931,7 @@ add_library("usp-discovery_proto__common_proto_cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/usp-discovery/proto/common.pb.cc"
     "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/usp-discovery/proto/common.pb.h"
 )
-target_link_libraries("usp-discovery_proto__common_proto_cc" 
-)
-target_include_directories("usp-discovery_proto__common_proto_cc" PUBLIC
-    "user_cache/bazel/_bazel_fawuwu/06f235ad655edc9cbbe71694fe7da214/execroot/__main__/bazel-out/k8-py2-fastbuild/bin/usp-discovery/proto"
+target_link_libraries("usp-discovery_proto__common_proto_cc" PUBLIC
 )
 set_target_properties("usp-discovery_proto__common_proto_cc" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4467,7 +3942,7 @@ add_library("bsv2_nvmf_tgt__nvmf_tgt"
     "bsv2_nvmf_tgt/app/NvmfTgtServer.h"
     "bsv2_nvmf_tgt/app/main.cpp"
 )
-target_link_libraries("bsv2_nvmf_tgt__nvmf_tgt" 
+target_link_libraries("bsv2_nvmf_tgt__nvmf_tgt" PUBLIC
     "blockstorage_base__background_logger"
     "blockstorage_metadata__metadata"
     "bsv2_nvmf_tgt__bdev_bsv2"
@@ -4476,9 +3951,6 @@ target_link_libraries("bsv2_nvmf_tgt__nvmf_tgt"
     "spdk_nvmf_tgt__spdk_env_dpdk_rpc"
     "spdk_nvmf_tgt__spdk_event"
     "spdk_nvmf_tgt__spdk_event_bdev"
-)
-target_include_directories("bsv2_nvmf_tgt__nvmf_tgt" PUBLIC
-    "bsv2_nvmf_tgt/app"
 )
 set_target_properties("bsv2_nvmf_tgt__nvmf_tgt" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4496,7 +3968,7 @@ add_library("bsv2_nvmf_tgt__bdev_bsv2"
     "bsv2_nvmf_tgt/bdev/bdev_bsv2_volume.c"
     "bsv2_nvmf_tgt/bdev/bdev_bsv2_volume.h"
 )
-target_link_libraries("bsv2_nvmf_tgt__bdev_bsv2" 
+target_link_libraries("bsv2_nvmf_tgt__bdev_bsv2" PUBLIC
     "blockstorage_base__base"
     "blockstorage_client__client"
     "blockstorage_client__mockserver"
@@ -4506,9 +3978,6 @@ target_link_libraries("bsv2_nvmf_tgt__bdev_bsv2"
     "blockstorage_metrics__metrics"
     "blockstorage_socket__socket"
     "spdk_nvmf_tgt__spdk"
-)
-target_include_directories("bsv2_nvmf_tgt__bdev_bsv2" PUBLIC
-    "bsv2_nvmf_tgt/bdev"
 )
 set_target_properties("bsv2_nvmf_tgt__bdev_bsv2" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4691,29 +4160,7 @@ add_library("spdk_nvmf_tgt__spdk"
     "spdk_nvmf_tgt/lib/vmd/vmd_spec.h"
     "spdk_nvmf_tgt/module/sock/posix/posix.c"
 )
-target_link_libraries("spdk_nvmf_tgt__spdk" 
-)
-target_include_directories("spdk_nvmf_tgt__spdk" PUBLIC
-    "spdk_nvmf_tgt/lib/conf"
-    "spdk_nvmf_tgt/lib/util/arm"
-    "spdk_nvmf_tgt/lib/sock"
-    "spdk_nvmf_tgt/lib/thread"
-    "spdk_nvmf_tgt/lib/bdev"
-    "spdk_nvmf_tgt/lib/jsonrpc"
-    "spdk_nvmf_tgt/lib/json"
-    "spdk_nvmf_tgt/lib/vmd"
-    "spdk_nvmf_tgt/lib/nvmf"
-    "spdk_nvmf_tgt/module/sock/posix"
-    "spdk_nvmf_tgt/lib/util"
-    "spdk_nvmf_tgt/lib/net"
-    "spdk_nvmf_tgt/lib/accel"
-    "spdk_nvmf_tgt/lib/log"
-    "spdk_nvmf_tgt/lib/rpc"
-    "spdk_nvmf_tgt/lib/notify"
-    "spdk_nvmf_tgt/lib/trace"
-    "spdk_nvmf_tgt/lib/nvme"
-    "spdk_nvmf_tgt/include/spdk_internal"
-    "spdk_nvmf_tgt/include/spdk"
+target_link_libraries("spdk_nvmf_tgt__spdk" PUBLIC
 )
 set_target_properties("spdk_nvmf_tgt__spdk" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4727,24 +4174,18 @@ add_library("spdk_nvmf_tgt__spdk_env_dpdk"
     "spdk_nvmf_tgt/lib/env_dpdk/pci_vmd.c"
     "spdk_nvmf_tgt/lib/env_dpdk/threads.c"
 )
-target_link_libraries("spdk_nvmf_tgt__spdk_env_dpdk" 
+target_link_libraries("spdk_nvmf_tgt__spdk_env_dpdk" PUBLIC
     "spdk_dpdk__dpdk"
     "spdk_nvmf_tgt__spdk"
-)
-target_include_directories("spdk_nvmf_tgt__spdk_env_dpdk" PUBLIC
-    "spdk_nvmf_tgt/lib/env_dpdk"
 )
 set_target_properties("spdk_nvmf_tgt__spdk_env_dpdk" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("spdk_nvmf_tgt__spdk_env_dpdk_rpc" 
     "spdk_nvmf_tgt/module/env_dpdk/env_dpdk_rpc.c"
 )
-target_link_libraries("spdk_nvmf_tgt__spdk_env_dpdk_rpc" 
+target_link_libraries("spdk_nvmf_tgt__spdk_env_dpdk_rpc" PUBLIC
     "spdk_nvmf_tgt__spdk"
     "spdk_nvmf_tgt__spdk_env_dpdk"
-)
-target_include_directories("spdk_nvmf_tgt__spdk_env_dpdk_rpc" PUBLIC
-    "spdk_nvmf_tgt/module/env_dpdk"
 )
 set_target_properties("spdk_nvmf_tgt__spdk_env_dpdk_rpc" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4762,13 +4203,9 @@ add_library("spdk_nvmf_tgt__spdk_event"
     "spdk_nvmf_tgt/lib/event/subsystem.c"
     "spdk_nvmf_tgt/lib/event/subsystem_rpc.c"
 )
-target_link_libraries("spdk_nvmf_tgt__spdk_event" 
+target_link_libraries("spdk_nvmf_tgt__spdk_event" PUBLIC
     "spdk_nvmf_tgt__spdk"
     "spdk_nvmf_tgt__spdk_env_dpdk"
-)
-target_include_directories("spdk_nvmf_tgt__spdk_event" PUBLIC
-    "spdk_nvmf_tgt/include/spdk"
-    "spdk_nvmf_tgt/lib/event"
 )
 set_target_properties("spdk_nvmf_tgt__spdk_event" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -4780,15 +4217,9 @@ add_library("spdk_nvmf_tgt__spdk_event_bdev"
     "spdk_nvmf_tgt/module/event/subsystems/vmd/vmd.c"
     "spdk_nvmf_tgt/module/event/subsystems/vmd/vmd_rpc.c"
 )
-target_link_libraries("spdk_nvmf_tgt__spdk_event_bdev" 
+target_link_libraries("spdk_nvmf_tgt__spdk_event_bdev" PUBLIC
     "spdk_nvmf_tgt__spdk"
     "spdk_nvmf_tgt__spdk_event"
-)
-target_include_directories("spdk_nvmf_tgt__spdk_event_bdev" PUBLIC
-    "spdk_nvmf_tgt/module/event/subsystems/sock"
-    "spdk_nvmf_tgt/module/event/subsystems/accel"
-    "spdk_nvmf_tgt/module/event/subsystems/vmd"
-    "spdk_nvmf_tgt/module/event/subsystems/bdev"
 )
 set_target_properties("spdk_nvmf_tgt__spdk_event_bdev" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -5025,37 +4456,14 @@ add_library("spdk_dpdk__dpdk"
     "spdk_dpdk/lib/librte_telemetry/telemetry_json.h"
     "spdk_dpdk/lib/librte_telemetry/telemetry_legacy.c"
 )
-target_link_libraries("spdk_dpdk__dpdk" 
-)
-target_include_directories("spdk_dpdk__dpdk" PUBLIC
-    "spdk_dpdk/lib/librte_metrics"
-    "spdk_dpdk/lib/librte_telemetry"
-    "spdk_dpdk/include"
-    "spdk_dpdk/lib/librte_kvargs"
-    "spdk_dpdk/drivers/mempool/bucket"
-    "spdk_dpdk/lib/librte_mempool"
-    "spdk_dpdk/lib/librte_eal/x86"
-    "spdk_dpdk/lib/librte_eal/include/generic"
-    "spdk_dpdk/drivers/bus/pci/linux"
-    "spdk_dpdk/lib/librte_pci"
-    "spdk_dpdk/lib/librte_eal/include"
-    "spdk_dpdk/lib/librte_eal/unix"
-    "spdk_dpdk/lib/librte_eal/linux/include"
-    "spdk_dpdk/lib/librte_ring"
-    "spdk_dpdk/lib/librte_eal/linux"
-    "spdk_dpdk/drivers/bus/pci"
-    "spdk_dpdk/lib/librte_eal/common"
-    "spdk_dpdk/lib/librte_eal/arm"
-    "spdk_dpdk/drivers/mempool/ring"
-    "spdk_dpdk/lib/librte_eal/arm/include"
-    "spdk_dpdk/lib/librte_eal/x86/include"
+target_link_libraries("spdk_dpdk__dpdk" PUBLIC
 )
 set_target_properties("spdk_dpdk__dpdk" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("spdk_nvmf_tgt__spdk_nvmf_tgt" 
     "spdk_nvmf_tgt/app/nvmf_tgt/nvmf_main.c"
 )
-target_link_libraries("spdk_nvmf_tgt__spdk_nvmf_tgt" 
+target_link_libraries("spdk_nvmf_tgt__spdk_nvmf_tgt" PUBLIC
     "bsv2_nvmf_tgt__bdev_bsv2"
     "spdk_nvmf_tgt__bdev_malloc"
     "spdk_nvmf_tgt__spdk"
@@ -5064,9 +4472,6 @@ target_link_libraries("spdk_nvmf_tgt__spdk_nvmf_tgt"
     "spdk_nvmf_tgt__spdk_event"
     "spdk_nvmf_tgt__spdk_event_nvmf"
 )
-target_include_directories("spdk_nvmf_tgt__spdk_nvmf_tgt" PUBLIC
-    "spdk_nvmf_tgt/app/nvmf_tgt"
-)
 set_target_properties("spdk_nvmf_tgt__spdk_nvmf_tgt" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_library("spdk_nvmf_tgt__bdev_malloc" 
@@ -5074,11 +4479,8 @@ add_library("spdk_nvmf_tgt__bdev_malloc"
     "spdk_nvmf_tgt/module/bdev/malloc/bdev_malloc.h"
     "spdk_nvmf_tgt/module/bdev/malloc/bdev_malloc_rpc.c"
 )
-target_link_libraries("spdk_nvmf_tgt__bdev_malloc" 
+target_link_libraries("spdk_nvmf_tgt__bdev_malloc" PUBLIC
     "spdk_nvmf_tgt__spdk"
-)
-target_include_directories("spdk_nvmf_tgt__bdev_malloc" PUBLIC
-    "spdk_nvmf_tgt/module/bdev/malloc"
 )
 set_target_properties("spdk_nvmf_tgt__bdev_malloc" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -5087,13 +4489,10 @@ add_library("spdk_nvmf_tgt__spdk_event_nvmf"
     "spdk_nvmf_tgt/module/event/subsystems/nvmf/nvmf_rpc.c"
     "spdk_nvmf_tgt/module/event/subsystems/nvmf/nvmf_tgt.c"
 )
-target_link_libraries("spdk_nvmf_tgt__spdk_event_nvmf" 
+target_link_libraries("spdk_nvmf_tgt__spdk_event_nvmf" PUBLIC
     "spdk_nvmf_tgt__spdk"
     "spdk_nvmf_tgt__spdk_event"
     "spdk_nvmf_tgt__spdk_event_bdev"
-)
-target_include_directories("spdk_nvmf_tgt__spdk_event_nvmf" PUBLIC
-    "spdk_nvmf_tgt/module/event/subsystems/nvmf"
 )
 set_target_properties("spdk_nvmf_tgt__spdk_event_nvmf" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -5102,11 +4501,8 @@ set_target_properties("spdk_nvmf_tgt__spdk_event_nvmf" PROPERTIES LINKER_LANGUAG
 add_executable("extentServer" 
     "blockstorage/main.cpp"
 )
-target_link_libraries("extentServer"
+target_link_libraries("extentServer" PUBLIC
     "blockstorage_extentserver__extentserver"
-)
-target_include_directories("extentServer" PUBLIC
-    "blockstorage"
 )
 set_target_properties("extentServer" PROPERTIES LINKER_LANGUAGE CXX)
 add_executable("tgtd" 
@@ -5175,7 +4571,7 @@ add_executable("tgtd"
     "tgt/usr/work.c"
     "tgt/usr/work.h"
 )
-target_link_libraries("tgtd"
+target_link_libraries("tgtd" PUBLIC
     "blockstorage_base__background_logger"
     "blockstorage_base__base"
     "blockstorage_client__client"
@@ -5187,10 +4583,6 @@ target_link_libraries("tgtd"
     "usp-block-client_block-client__block-client"
     "usp-block-client_block-metadata__block-metadata"
 )
-target_include_directories("tgtd" PUBLIC
-    "tgt/usr/iscsi"
-    "tgt/usr"
-)
 set_target_properties("tgtd" PROPERTIES LINKER_LANGUAGE CXX)
 add_executable("nvmf_tgt" 
     "bsv2_nvmf_tgt/app/MgmtApi.cpp"
@@ -5199,7 +4591,7 @@ add_executable("nvmf_tgt"
     "bsv2_nvmf_tgt/app/NvmfTgtServer.h"
     "bsv2_nvmf_tgt/app/main.cpp"
 )
-target_link_libraries("nvmf_tgt"
+target_link_libraries("nvmf_tgt" PUBLIC
     "blockstorage_base__background_logger"
     "blockstorage_metadata__metadata"
     "bsv2_nvmf_tgt__bdev_bsv2"
@@ -5209,14 +4601,11 @@ target_link_libraries("nvmf_tgt"
     "spdk_nvmf_tgt__spdk_event"
     "spdk_nvmf_tgt__spdk_event_bdev"
 )
-target_include_directories("nvmf_tgt" PUBLIC
-    "bsv2_nvmf_tgt/app"
-)
 set_target_properties("nvmf_tgt" PROPERTIES LINKER_LANGUAGE CXX)
 add_executable("spdk_nvmf_tgt" 
     "spdk_nvmf_tgt/app/nvmf_tgt/nvmf_main.c"
 )
-target_link_libraries("spdk_nvmf_tgt"
+target_link_libraries("spdk_nvmf_tgt" PUBLIC
     "bsv2_nvmf_tgt__bdev_bsv2"
     "spdk_nvmf_tgt__bdev_malloc"
     "spdk_nvmf_tgt__spdk"
@@ -5224,8 +4613,5 @@ target_link_libraries("spdk_nvmf_tgt"
     "spdk_nvmf_tgt__spdk_env_dpdk_rpc"
     "spdk_nvmf_tgt__spdk_event"
     "spdk_nvmf_tgt__spdk_event_nvmf"
-)
-target_include_directories("spdk_nvmf_tgt" PUBLIC
-    "spdk_nvmf_tgt/app/nvmf_tgt"
 )
 set_target_properties("spdk_nvmf_tgt" PROPERTIES LINKER_LANGUAGE CXX)
