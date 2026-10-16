@@ -30,3 +30,7 @@ python3 ./get_transcript.py \
 --url "https://www.youtube.com/watch?v=MIJFyUPG4Z4&list=PL5q3E8eRUieWtYLmRU3z94-vGRcwKr9tM&index=7&pp=iAQB" \
 --output_dir ~/Downloads
 ```
+**Sample output**:
+```
+Transcript written to /Users/fanwu/Downloads/Design_a_Distributed_Rate_Limiter_w_a_Ex_Meta_Staff_Engineer_System_Design_Breakdown.md
+```
