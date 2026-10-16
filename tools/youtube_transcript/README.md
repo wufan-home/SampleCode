@@ -37,3 +37,9 @@ python3 ~/youtube_transcript/get_transcript.py \
 ```
 Transcript written to /Users/fanwu/Downloads/Design_a_Distributed_Rate_Limiter_w_a_Ex_Meta_Staff_Engineer_System_Design_Breakdown.md
 ```
+
+### Step 3: Use AI to Understand the Script
+Use the following prompt:
+```
+翻译 /Users/fanwu/Downloads/Design_a_Distributed_Rate_Limiter_w_a_Ex_Meta_Staff_Engineer_System_Design_Breakdown.md z至中文。然后总结思维导图。要求：从左到右展开
+```
