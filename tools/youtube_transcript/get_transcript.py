@@ -60,8 +60,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Download a YouTube video's transcript as a Markdown file."
     )
-    parser.add_argument("url", help="YouTube video URL (a bare video ID also works)")
-    parser.add_argument("output_dir", type=Path, help="Folder to write the transcript into")
+    parser.add_argument("--url", help="YouTube video URL (a bare video ID also works)")
+    parser.add_argument("--output_dir", type=Path, help="Folder to write the transcript into")
     args = parser.parse_args()
 
     try:
